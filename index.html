@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;900&display=swap" rel="stylesheet">
 
-  <!-- TGS (Telegram Sticker) ডিকম্প্রেস ও প্লে করার লাইব্রেরি -->
+  <!-- TGS ডিকম্প্রেস ও প্লে করার লাইব্রেরি -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 
@@ -23,7 +23,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
     }
-
     .title-3d {
       font-family: 'Fredoka', sans-serif;
       font-weight: 900;
@@ -31,49 +30,25 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
     .btn-glossy-3d {
       font-family: 'Fredoka', sans-serif;
       position: relative;
       cursor: pointer;
       overflow: hidden;
-      transition: all 0.1s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
-
-    .btn-glossy-3d::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 10%;
-      right: 10%;
-      height: 40%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-radius: 9999px;
-      pointer-events: none;
-    }
-
-    .btn-glossy-3d:active {
-      transform: translateY(3px);
-    }
-
     .btn-cyan {
       background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
       box-shadow: 0 4px 0 #075985, 0 8px 12px rgba(2, 132, 199, 0.4);
       color: #ffffff;
     }
-    .btn-cyan:active {
-      box-shadow: 0 1px 0 #075985;
-    }
-
     .btn-emerald {
       background: linear-gradient(180deg, #34d399 0%, #059669 60%, #064e3b 100%);
       box-shadow: 0 4px 0 #064e3b, 0 8px 12px rgba(5, 150, 105, 0.4);
       color: #ffffff;
     }
-
     .progress-bar-glow {
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
     }
@@ -83,7 +58,6 @@
 
   <div class="w-full max-w-md bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl relative text-center">
     
-    <!-- হেডার -->
     <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-3xl shadow-lg">
       🐱
     </div>
@@ -101,10 +75,10 @@
       <p id="fileLabel" class="text-xs font-bold text-slate-200 uppercase font-mono tracking-wide">
         Click or Drag file here
       </p>
-      <span id="fileSizeLabel" class="text-[10px] text-slate-500 font-mono mt-1 block">Max size: 100MB</span>
+      <span id="fileSizeLabel" class="text-[10px] text-slate-500 font-mono mt-1 block">Max size: 4.5MB (Vercel)</span>
     </div>
 
-    <!-- অপশনাল Catbox Userhash -->
+    <!-- Userhash -->
     <div class="mt-3 text-left">
       <input type="text" id="userHash" placeholder="Optional: Catbox Userhash" 
              class="w-full bg-[#070b14] border border-slate-800 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-cyan-400" />
@@ -113,7 +87,7 @@
     <!-- প্রগ্রেস বার -->
     <div id="progressBox" class="hidden mt-4 w-full">
       <div class="flex justify-between text-xs font-mono text-slate-400 mb-1">
-        <span id="uploadStatus">Uploading to Catbox...</span>
+        <span id="uploadStatus">Uploading...</span>
         <span id="uploadPercent">0%</span>
       </div>
       <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
@@ -121,13 +95,12 @@
       </div>
     </div>
 
-    <!-- আপলোড বাটন -->
     <button onclick="uploadToCatbox()" id="uploadBtn" 
             class="w-full mt-4 btn-glossy-3d btn-cyan py-3 rounded-xl font-bold text-xs uppercase tracking-wider">
       🚀 Upload & Get Link
     </button>
 
-    <!-- আউটপুট রেজাল্ট বক্স -->
+    <!-- রেজাল্ট বক্স -->
     <div id="resultBox" class="hidden mt-5 text-left bg-[#070b14] p-4 rounded-2xl border border-slate-800/90 shadow-inner">
       <div class="flex items-center justify-between mb-2">
         <span class="text-[10px] font-mono text-emerald-400 uppercase font-bold flex items-center gap-1.5">
@@ -139,11 +112,9 @@
         </button>
       </div>
 
-      <!-- তৈরি হওয়া ডিরেক্ট লিঙ্ক -->
       <input type="text" id="resultUrl" readonly 
              class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 select-all focus:outline-none" />
 
-      <!-- প্রিভিউ এরিয়া (WebM, TGS, Image) -->
       <div id="previewArea" class="mt-3 flex items-center justify-center overflow-hidden rounded-xl min-h-24 max-h-56 bg-black/40 p-2">
       </div>
     </div>
@@ -190,8 +161,8 @@
       uploadBtn.disabled = true;
       uploadBtn.classList.add('opacity-50');
       progressBox.classList.remove('hidden');
-      progressBar.style.width = '20%';
-      uploadPercent.innerText = '20%';
+      progressBar.style.width = '30%';
+      uploadPercent.innerText = '30%';
 
       const formData = new FormData();
       formData.append('reqtype', 'fileupload');
@@ -201,26 +172,20 @@
       formData.append('fileToUpload', selectedFile);
 
       try {
-        const endpoint = '/api/catbox';
-
         progressBar.style.width = '60%';
         uploadPercent.innerText = '60%';
 
-        const response = await fetch(endpoint, {
+        const response = await fetch('/api/catbox', {
           method: 'POST',
           body: formData
         });
-
-        if (!response.ok) {
-          throw new Error("Server response was not ok");
-        }
 
         const catboxUrl = await response.text();
 
         progressBar.style.width = '100%';
         uploadPercent.innerText = '100%';
 
-        if (catboxUrl.startsWith('http')) {
+        if (response.ok && catboxUrl.startsWith('http')) {
           await showResult(catboxUrl.trim());
         } else {
           alert("Catbox Error: " + catboxUrl);
@@ -235,7 +200,6 @@
       }
     }
 
-    // প্রিভিউ ফাংশন (WebM, TGS, Image, Audio)
     async function showResult(url) {
       const resultBox = document.getElementById('resultBox');
       const resultUrl = document.getElementById('resultUrl');
@@ -247,26 +211,26 @@
 
       const ext = url.split('.').pop().toLowerCase();
 
-      // ১. ছবি (Image Preview)
+      // ১. ছবি
       if (['jpeg', 'jpg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
         previewArea.innerHTML = `<img src="${url}" class="max-h-48 object-contain rounded-lg shadow" alt="Preview" />`;
       }
-      // ২. WebM / MP4 ভিডিও (Live Video Player Preview)
+      // ২. ভিডিও
       else if (['webm', 'mp4', 'mov'].includes(ext)) {
         previewArea.innerHTML = `
           <video controls autoplay loop muted playsinline class="max-h-48 rounded-lg shadow">
             <source src="${url}" type="video/${ext === 'mov' ? 'mp4' : ext}">
-            Video format not supported.
           </video>`;
       }
-      // ৩. টেলিগ্রাম অ্যানিমেটেড স্টিকার (.tgs Preview)
+      // ৩. টেলিগ্রাম অ্যানিমেটেড স্টিকার (.tgs) - ফিক্স করা অংশ
       else if (ext === 'tgs') {
         previewArea.innerHTML = `<div id="tgsContainer" style="width: 140px; height: 140px;"></div>`;
         try {
-          // সিলেক্ট করা ফাইল থেকে ডিকম্প্রেস করে প্লে করবে
           const arrayBuffer = await selectedFile.arrayBuffer();
-          const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
-          const animationData = JSON.parse(decompressed);
+          // Pako 2.x এর সঠিক ডিকোড নিয়ম:
+          const decompressed = pako.inflate(new Uint8Array(arrayBuffer));
+          const jsonString = new TextDecoder("utf-8").decode(decompressed);
+          const animationData = JSON.parse(jsonString);
 
           lottie.loadAnimation({
             container: document.getElementById('tgsContainer'),
@@ -276,17 +240,10 @@
             animationData: animationData
           });
         } catch (e) {
-          previewArea.innerHTML = `<p class="text-xs text-cyan-400 font-mono">Telegram Sticker (.tgs) ready!</p>`;
+          console.error("TGS Play Error:", e);
+          previewArea.innerHTML = `<p class="text-xs text-cyan-400 font-mono">✅ Telegram Sticker Uploaded Successfully!</p>`;
         }
       }
-      // ৪. অডিও ফাইল
-      else if (['mp3', 'wav', 'ogg'].includes(ext)) {
-        previewArea.innerHTML = `
-          <audio controls class="w-full my-2">
-            <source src="${url}">
-          </audio>`;
-      }
-      // ৫. অন্যান্য ফাইল
       else {
         previewArea.innerHTML = `<a href="${url}" target="_blank" class="text-xs text-cyan-400 underline font-mono p-2">Click to open/download file ↗</a>`;
       }
