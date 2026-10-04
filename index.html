@@ -23,9 +23,7 @@
       color: #fff;
     }
 
-    /* =========================================
-       1. GLOSSY 3D WELCOME CARD
-       ========================================= */
+    /* Glossy 3D Header Card */
     .glossy-card {
       position: relative;
       background: linear-gradient(180deg, #2b3952 0%, #172033 100%);
@@ -40,8 +38,6 @@
         inset 0 1px 2px rgba(255, 255, 255, 0.6);
       overflow: hidden;
     }
-
-    /* Glossy reflection on top of card */
     .glossy-card::before {
       content: '';
       position: absolute;
@@ -53,7 +49,6 @@
       border-radius: 22px 22px 50% 50% / 22px 22px 15% 15%;
       pointer-events: none;
     }
-
     .glossy-card h1 {
       font-size: 21px;
       font-weight: 800;
@@ -67,15 +62,12 @@
       font-weight: 500;
     }
 
-    /* =========================================
-       2. ULTRA GLOSSY 3D BUTTONS
-       ========================================= */
+    /* Glossy 3D Category Buttons */
     .cat-container {
       display: flex;
       gap: 10px;
       margin-bottom: 14px;
     }
-
     .glossy-btn {
       flex: 1;
       position: relative;
@@ -93,16 +85,12 @@
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
       transition: all 0.1s ease;
       overflow: hidden;
-
-      /* Default Inactive Glossy Blue-Grey */
       background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
       box-shadow: 
         0 6px 0 #0f172a,
         0 10px 18px rgba(0, 0, 0, 0.35),
         inset 0 1px 1px rgba(255, 255, 255, 0.5);
     }
-
-    /* Curved Glossy Sheen (Classic Bubble/Gel Glare) */
     .glossy-btn::before {
       content: '';
       position: absolute;
@@ -114,8 +102,6 @@
       border-radius: 17px 17px 50% 50% / 17px 17px 20% 20%;
       pointer-events: none;
     }
-
-    /* 3D Push Click Effect */
     .glossy-btn:active {
       transform: translateY(5px);
       box-shadow: 
@@ -123,8 +109,6 @@
         0 4px 8px rgba(0, 0, 0, 0.4),
         inset 0 2px 4px rgba(0, 0, 0, 0.5);
     }
-
-    /* Active Highlight States */
     .glossy-btn.active {
       background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
       box-shadow: 
@@ -132,14 +116,8 @@
         0 12px 22px rgba(2, 132, 199, 0.5),
         inset 0 1px 2px rgba(255, 255, 255, 0.9);
     }
-    .glossy-btn.active:active {
-      transform: translateY(5px);
-      box-shadow: 0 1px 0 #0369a1, 0 4px 8px rgba(0, 0, 0, 0.4);
-    }
 
-    /* =========================================
-       3. GLOSSY SUCCESS TOAST BADGE
-       ========================================= */
+    /* Glossy Success Toast */
     #toast {
       display: none;
       position: relative;
@@ -159,21 +137,8 @@
       overflow: hidden;
       animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    #toast::before {
-      content: '';
-      position: absolute;
-      top: 1px;
-      left: 5px;
-      right: 5px;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-radius: 20px 20px 50% 50% / 20px 20px 20% 20%;
-      pointer-events: none;
-    }
 
-    /* =========================================
-       4. GLOSSY OUTPUT DISPLAY CONTAINER
-       ========================================= */
+    /* Output Display Box */
     #output-box {
       flex: 1;
       background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -206,9 +171,7 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
-    /* =========================================
-       5. GLOSSY 3D ACTION BUTTONS (ZIP & PREVIEW)
-       ========================================= */
+    /* Action Buttons (ZIP & Preview) */
     .action-bar {
       display: none;
       gap: 10px;
@@ -231,17 +194,6 @@
       overflow: hidden;
       transition: all 0.1s ease;
     }
-    .action-btn::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      right: 3px;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-radius: 14px 14px 50% 50% / 14px 14px 20% 20%;
-      pointer-events: none;
-    }
     .preview-btn {
       background: linear-gradient(180deg, #10b981 0%, #059669 100%);
       box-shadow: 0 5px 0 #047857, 0 10px 15px rgba(16, 185, 129, 0.4), inset 0 1px 1px #fff;
@@ -250,7 +202,6 @@
       transform: translateY(4px);
       box-shadow: 0 1px 0 #047857;
     }
-
     .zip-btn {
       background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
       box-shadow: 0 5px 0 #9f1239, 0 10px 15px rgba(244, 63, 94, 0.4), inset 0 1px 1px #fff;
@@ -260,9 +211,7 @@
       box-shadow: 0 1px 0 #9f1239;
     }
 
-    /* =========================================
-       6. GLOSSY INPUT BAR & SEND BUTTON
-       ========================================= */
+    /* Input & Send */
     .input-box {
       display: flex;
       gap: 10px;
@@ -278,10 +227,6 @@
       outline: none;
       box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
     }
-    input::placeholder {
-      color: #94a3b8;
-    }
-
     .send-btn {
       position: relative;
       padding: 14px 22px;
@@ -295,17 +240,6 @@
       cursor: pointer;
       overflow: hidden;
       transition: all 0.1s ease;
-    }
-    .send-btn::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      right: 3px;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.05) 100%);
-      border-radius: 16px 16px 50% 50% / 16px 16px 20% 20%;
-      pointer-events: none;
     }
     .send-btn:active {
       transform: translateY(4px);
@@ -344,40 +278,33 @@
 </head>
 <body>
 
-  <!-- English Welcome Header with Glossy 3D finish -->
   <div class="glossy-card">
     <h1>Welcome to Gemini Ultra Studio</h1>
     <p>Select your mode to generate code, photos, or chat</p>
   </div>
 
-  <!-- Glossy 3D Categories -->
   <div class="cat-container">
     <button class="glossy-btn active" onclick="setCategory('coding', this)">💻 Coding</button>
     <button class="glossy-btn" onclick="setCategory('photo', this)">🎨 Photo</button>
     <button class="glossy-btn" onclick="setCategory('chat', this)">💬 Chat</button>
   </div>
 
-  <!-- Glossy Success Toast Badge -->
   <div id="toast">✨ Mode activated successfully!</div>
 
-  <!-- Output Box -->
   <div id="output-box">
-    Hello! I am your AI assistant. Choose a category and tell me what you need!
+    Hello! I am ready. What would you like to build or generate?
   </div>
 
-  <!-- 3D Action Buttons (Preview & ZIP) -->
   <div class="action-bar" id="actionBar">
     <button class="action-btn preview-btn" onclick="openPreview()">🌐 Live HTML Preview</button>
     <button class="action-btn zip-btn" onclick="sendZipToBot()">📦 Send ZIP to Bot Inbox</button>
   </div>
 
-  <!-- Input Bar -->
   <div class="input-box">
     <input type="text" id="userInput" placeholder="Ask for code, images, questions..." />
     <button class="send-btn" onclick="submitPrompt()">SEND</button>
   </div>
 
-  <!-- HTML Live Preview Modal -->
   <div id="preview-modal">
     <header>
       <span style="font-weight: 800; font-size: 15px;">🌐 Live Website Preview</span>
@@ -403,7 +330,6 @@
       toast.innerText = `✨ ${cat.toUpperCase()} mode activated successfully!`;
 
       if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-
       setTimeout(() => { toast.style.display = "none"; }, 2500);
     }
 
@@ -427,24 +353,36 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt, category: currentCategory })
         });
+        
         const data = await res.json();
 
+        // ১. যদি সার্ভার কোনো এরর দেয়, সরাসরি লাল রঙে দেখাবে
+        if (data.error) {
+          output.innerHTML = `<span style="color: #f87171; font-weight: bold;">⚠️ Error: ${escapeHtml(data.error)}</span>`;
+          return;
+        }
+
+        // ২. যদি ফটো রিটার্ন করে
         if (data.type === 'image') {
           output.innerHTML = `<img src="${data.result}" alt="Generated Photo" />`;
-        } else {
-          output.innerHTML = `<pre>${escapeHtml(data.result)}</pre>`;
-          latestRawCode = extractHtmlCode(data.result);
+        } 
+        // ৩. টেক্সট বা কোড রিটার্ন করলে
+        else {
+          const content = data.result || "No content returned.";
+          output.innerHTML = `<pre>${escapeHtml(content)}</pre>`;
+          latestRawCode = extractHtmlCode(content);
 
           if (latestRawCode || currentCategory === 'coding') {
             actionBar.style.display = "flex";
           }
         }
       } catch (err) {
-        output.innerText = "Error: " + err.message;
+        output.innerHTML = `<span style="color: #f87171; font-weight: bold;">⚠️ App Error: ${escapeHtml(err.message)}</span>`;
       }
     }
 
     function extractHtmlCode(text) {
+      if (!text) return "";
       const match = text.match(/```html([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/i);
       return match ? match[1].trim() : text;
     }
@@ -490,8 +428,13 @@
       }
     }
 
+    // এরর প্রতিরোধক সেফ escapeHtml ফাংশন
     function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
     }
   </script>
 </body>
