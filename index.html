@@ -2,262 +2,496 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Catbox File Uploader</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;900&display=swap" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Gemini Ultra Glossy 3D</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      background-color: #0b0f19;
-      color: #f3f4f6;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      user-select: none;
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0a0f1d 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      color: #fff;
     }
-    .title-3d {
-      font-family: 'Fredoka', sans-serif;
-      font-weight: 900;
-      background: linear-gradient(180deg, #ffffff 15%, #38bdf8 50%, #0284c7 80%, #0369a1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .btn-glossy-3d {
-      font-family: 'Fredoka', sans-serif;
+
+    /* =========================================
+       1. GLOSSY 3D WELCOME CARD
+       ========================================= */
+    .glossy-card {
       position: relative;
-      cursor: pointer;
+      background: linear-gradient(180deg, #2b3952 0%, #172033 100%);
+      border-radius: 26px;
+      padding: 20px 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 0 #0d1320,
+        0 18px 30px rgba(0, 0, 0, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.6);
       overflow: hidden;
-      display: inline-flex;
+    }
+
+    /* Glossy reflection on top of card */
+    .glossy-card::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      right: 6px;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.03) 100%);
+      border-radius: 22px 22px 50% 50% / 22px 22px 15% 15%;
+      pointer-events: none;
+    }
+
+    .glossy-card h1 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.6);
+      margin-bottom: 5px;
+    }
+    .glossy-card p {
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    /* =========================================
+       2. ULTRA GLOSSY 3D BUTTONS
+       ========================================= */
+    .cat-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .glossy-btn {
+      flex: 1;
+      position: relative;
+      padding: 13px 6px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
+      gap: 5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      transition: all 0.1s ease;
+      overflow: hidden;
+
+      /* Default Inactive Glossy Blue-Grey */
+      background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
+      box-shadow: 
+        0 6px 0 #0f172a,
+        0 10px 18px rgba(0, 0, 0, 0.35),
+        inset 0 1px 1px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Curved Glossy Sheen (Classic Bubble/Gel Glare) */
+    .glossy-btn::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      right: 3px;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.08) 100%);
+      border-radius: 17px 17px 50% 50% / 17px 17px 20% 20%;
+      pointer-events: none;
+    }
+
+    /* 3D Push Click Effect */
+    .glossy-btn:active {
+      transform: translateY(5px);
+      box-shadow: 
+        0 1px 0 #0f172a,
+        0 4px 8px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Active Highlight States */
+    .glossy-btn.active {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      box-shadow: 
+        0 6px 0 #0369a1,
+        0 12px 22px rgba(2, 132, 199, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+    .glossy-btn.active:active {
+      transform: translateY(5px);
+      box-shadow: 0 1px 0 #0369a1, 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* =========================================
+       3. GLOSSY SUCCESS TOAST BADGE
+       ========================================= */
+    #toast {
+      display: none;
+      position: relative;
+      background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 
+        0 5px 0 #064e3b,
+        0 10px 20px rgba(16, 185, 129, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      overflow: hidden;
+      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #toast::before {
+      content: '';
+      position: absolute;
+      top: 1px;
+      left: 5px;
+      right: 5px;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 20px 20px 50% 50% / 20px 20px 20% 20%;
+      pointer-events: none;
+    }
+
+    /* =========================================
+       4. GLOSSY OUTPUT DISPLAY CONTAINER
+       ========================================= */
+    #output-box {
+      flex: 1;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 24px;
+      padding: 16px;
+      overflow-y: auto;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+      min-height: 240px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        0 6px 0 #0a0f1a,
+        inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+    #output-box pre {
+      background: #000000bb;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 12px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    #output-box img {
+      width: 100%;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    /* =========================================
+       5. GLOSSY 3D ACTION BUTTONS (ZIP & PREVIEW)
+       ========================================= */
+    .action-bar {
+      display: none;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .action-btn {
+      flex: 1;
+      position: relative;
+      padding: 12px;
+      border-radius: 18px;
+      font-weight: 800;
+      font-size: 12px;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      overflow: hidden;
       transition: all 0.1s ease;
     }
-    .btn-cyan {
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
-      box-shadow: 0 4px 0 #075985, 0 8px 12px rgba(2, 132, 199, 0.4);
-      color: #ffffff;
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      right: 3px;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 14px 14px 50% 50% / 14px 14px 20% 20%;
+      pointer-events: none;
     }
-    .btn-emerald {
-      background: linear-gradient(180deg, #34d399 0%, #059669 60%, #064e3b 100%);
-      box-shadow: 0 4px 0 #064e3b, 0 8px 12px rgba(5, 150, 105, 0.4);
-      color: #ffffff;
+    .preview-btn {
+      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 5px 0 #047857, 0 10px 15px rgba(16, 185, 129, 0.4), inset 0 1px 1px #fff;
     }
-    .progress-bar-glow {
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+    .preview-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #047857;
+    }
+
+    .zip-btn {
+      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
+      box-shadow: 0 5px 0 #9f1239, 0 10px 15px rgba(244, 63, 94, 0.4), inset 0 1px 1px #fff;
+    }
+    .zip-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #9f1239;
+    }
+
+    /* =========================================
+       6. GLOSSY INPUT BAR & SEND BUTTON
+       ========================================= */
+    .input-box {
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 14px 16px;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
+    }
+    input::placeholder {
+      color: #94a3b8;
+    }
+
+    .send-btn {
+      position: relative;
+      padding: 14px 22px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+      box-shadow: 0 5px 0 #312e81, 0 10px 20px rgba(99, 102, 241, 0.4), inset 0 1px 1px #fff;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.1s ease;
+    }
+    .send-btn::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      right: 3px;
+      height: 48%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.05) 100%);
+      border-radius: 16px 16px 50% 50% / 16px 16px 20% 20%;
+      pointer-events: none;
+    }
+    .send-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #312e81;
+    }
+
+    /* Modal */
+    #preview-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      flex-direction: column;
+    }
+    #preview-modal header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      background: #111827;
+      border-bottom: 1px solid #374151;
+    }
+    #preview-iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body>
 
-  <div class="w-full max-w-md bg-[#111827] border border-slate-800 rounded-3xl p-6 shadow-2xl relative text-center">
-    
-    <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-3xl shadow-lg">
-      🐱
-    </div>
-    <h1 class="title-3d text-2xl uppercase tracking-wider mb-1">Catbox Uploader</h1>
-    <p class="text-xs font-mono text-slate-400 mb-5">Images, WebM & Telegram Stickers (.tgs)</p>
+  <!-- English Welcome Header with Glossy 3D finish -->
+  <div class="glossy-card">
+    <h1>Welcome to Gemini Ultra Studio</h1>
+    <p>Select your mode to generate code, photos, or chat</p>
+  </div>
 
-    <!-- ড্রপজোন -->
-    <div onclick="document.getElementById('fileInput').click()" 
-         id="dropZone"
-         class="border-2 border-dashed border-cyan-500/40 hover:border-cyan-400 bg-slate-900/60 rounded-2xl p-6 cursor-pointer transition-all active:scale-[0.98]">
-      
-      <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(event)" />
-      
-      <div class="text-4xl mb-2">📁</div>
-      <p id="fileLabel" class="text-xs font-bold text-slate-200 uppercase font-mono tracking-wide">
-        Click or Drag file here
-      </p>
-      <span id="fileSizeLabel" class="text-[10px] text-slate-500 font-mono mt-1 block">Max size: 4.5 MB</span>
-    </div>
+  <!-- Glossy 3D Categories -->
+  <div class="cat-container">
+    <button class="glossy-btn active" onclick="setCategory('coding', this)">💻 Coding</button>
+    <button class="glossy-btn" onclick="setCategory('photo', this)">🎨 Photo</button>
+    <button class="glossy-btn" onclick="setCategory('chat', this)">💬 Chat</button>
+  </div>
 
-    <!-- Catbox Userhash -->
-    <div class="mt-3 text-left">
-      <input type="text" id="userHash" placeholder="Optional: Catbox Userhash" 
-             class="w-full bg-[#070b14] border border-slate-800 rounded-xl px-3 py-2 text-[11px] font-mono text-slate-300 placeholder-slate-600 focus:outline-none focus:border-cyan-400" />
-    </div>
+  <!-- Glossy Success Toast Badge -->
+  <div id="toast">✨ Mode activated successfully!</div>
 
-    <!-- প্রগ্রেস বার -->
-    <div id="progressBox" class="hidden mt-4 w-full">
-      <div class="flex justify-between text-xs font-mono text-slate-400 mb-1">
-        <span id="uploadStatus">Uploading...</span>
-        <span id="uploadPercent">0%</span>
-      </div>
-      <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-        <div id="progressBar" class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 w-0 transition-all duration-100 progress-bar-glow"></div>
-      </div>
-    </div>
+  <!-- Output Box -->
+  <div id="output-box">
+    Hello! I am your AI assistant. Choose a category and tell me what you need!
+  </div>
 
-    <button onclick="uploadToCatbox()" id="uploadBtn" 
-            class="w-full mt-4 btn-glossy-3d btn-cyan py-3 rounded-xl font-bold text-xs uppercase tracking-wider">
-      🚀 Upload & Get Link
-    </button>
+  <!-- 3D Action Buttons (Preview & ZIP) -->
+  <div class="action-bar" id="actionBar">
+    <button class="action-btn preview-btn" onclick="openPreview()">🌐 Live HTML Preview</button>
+    <button class="action-btn zip-btn" onclick="sendZipToBot()">📦 Send ZIP to Bot Inbox</button>
+  </div>
 
-    <!-- আউটপুট রেজাল্ট -->
-    <div id="resultBox" class="hidden mt-5 text-left bg-[#070b14] p-4 rounded-2xl border border-slate-800/90 shadow-inner">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-[10px] font-mono text-emerald-400 uppercase font-bold flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Upload Successful!
-        </span>
-        <button onclick="copyLink()" id="copyBtn" class="btn-glossy-3d btn-emerald px-3 py-1 text-[11px] rounded-lg font-mono">
-          Copy Link
-        </button>
-      </div>
+  <!-- Input Bar -->
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="Ask for code, images, questions..." />
+    <button class="send-btn" onclick="submitPrompt()">SEND</button>
+  </div>
 
-      <input type="text" id="resultUrl" readonly 
-             class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 select-all focus:outline-none" />
-
-      <div id="previewArea" class="mt-3 flex items-center justify-center overflow-hidden rounded-xl min-h-24 max-h-56 bg-black/40 p-2">
-      </div>
-    </div>
-
+  <!-- HTML Live Preview Modal -->
+  <div id="preview-modal">
+    <header>
+      <span style="font-weight: 800; font-size: 15px;">🌐 Live Website Preview</span>
+      <button class="glossy-btn" style="padding: 6px 16px; flex: none;" onclick="closePreview()">✕ Close</button>
+    </header>
+    <iframe id="preview-iframe"></iframe>
   </div>
 
   <script>
-    let selectedFile = null;
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.expand();
 
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    let currentCategory = 'coding';
+    let latestRawCode = "";
 
-      selectedFile = file;
-      document.getElementById('fileLabel').innerText = file.name;
-      document.getElementById('fileSizeLabel').innerText = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-      document.getElementById('resultBox').classList.add('hidden');
+    function setCategory(cat, element) {
+      currentCategory = cat;
+      document.querySelectorAll('.glossy-btn').forEach(b => b.classList.remove('active'));
+      element.classList.add('active');
+
+      const toast = document.getElementById("toast");
+      toast.style.display = "block";
+      toast.innerText = `✨ ${cat.toUpperCase()} mode activated successfully!`;
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+      setTimeout(() => { toast.style.display = "none"; }, 2500);
     }
 
-    function uploadToCatbox() {
-      if (!selectedFile) {
-        alert("Please select a file first!");
+    async function submitPrompt() {
+      const input = document.getElementById("userInput");
+      const prompt = input.value.trim();
+      if (!prompt) return;
+
+      const output = document.getElementById("output-box");
+      const actionBar = document.getElementById("actionBar");
+      actionBar.style.display = "none";
+
+      output.innerHTML = `<em>✨ Generating ${currentCategory.toUpperCase()}... Please wait...</em>`;
+      input.value = "";
+
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, category: currentCategory })
+        });
+        const data = await res.json();
+
+        if (data.type === 'image') {
+          output.innerHTML = `<img src="${data.result}" alt="Generated Photo" />`;
+        } else {
+          output.innerHTML = `<pre>${escapeHtml(data.result)}</pre>`;
+          latestRawCode = extractHtmlCode(data.result);
+
+          if (latestRawCode || currentCategory === 'coding') {
+            actionBar.style.display = "flex";
+          }
+        }
+      } catch (err) {
+        output.innerText = "Error: " + err.message;
+      }
+    }
+
+    function extractHtmlCode(text) {
+      const match = text.match(/```html([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/i);
+      return match ? match[1].trim() : text;
+    }
+
+    function openPreview() {
+      if (!latestRawCode) return alert("No HTML code to preview!");
+      const modal = document.getElementById("preview-modal");
+      const iframe = document.getElementById("preview-iframe");
+      modal.style.display = "flex";
+      iframe.srcdoc = latestRawCode;
+    }
+
+    function closePreview() {
+      document.getElementById("preview-modal").style.display = "none";
+    }
+
+    async function sendZipToBot() {
+      const userId = tg?.initDataUnsafe?.user?.id;
+      if (!userId) {
+        alert("টেলিগ্রাম থেকে ওপেন করুন যাতে আপনার Chat ID পাওয়া যায়।");
         return;
       }
 
-      const uploadBtn = document.getElementById('uploadBtn');
-      const progressBox = document.getElementById('progressBox');
-      const progressBar = document.getElementById('progressBar');
-      const uploadPercent = document.getElementById('uploadPercent');
-      const uploadStatus = document.getElementById('uploadStatus');
-      const userHash = document.getElementById('userHash').value.trim();
+      alert("Creating ZIP and sending to your Telegram Bot Inbox...");
 
-      uploadBtn.disabled = true;
-      uploadBtn.classList.add('opacity-50');
-      progressBox.classList.remove('hidden');
-      progressBar.style.width = '0%';
-      uploadPercent.innerText = '0%';
-      uploadStatus.innerText = 'Connecting...';
-
-      const formData = new FormData();
-      formData.append('reqtype', 'fileupload');
-      if (userHash) {
-        formData.append('userhash', userHash);
-      }
-      formData.append('fileToUpload', selectedFile);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/catbox');
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const percent = Math.round((e.loaded / e.total) * 100);
-          progressBar.style.width = percent + '%';
-          uploadPercent.innerText = percent + '%';
-          uploadStatus.innerText = percent === 100 ? 'Processing Link...' : 'Uploading...';
-        }
-      };
-
-      xhr.onload = async () => {
-        uploadBtn.disabled = false;
-        uploadBtn.classList.remove('opacity-50');
-        setTimeout(() => progressBox.classList.add('hidden'), 800);
-
-        if (xhr.status === 404) {
-          alert("❌ Vercel 404 Error: api/catbox.js ফাইলটি পাওয়া যায়নি! দয়া করে GitHub-এ api/catbox.js ফাইলটি সঠিকভাবে তৈরি করুন।");
-          return;
-        }
-
-        if (xhr.status >= 200 && xhr.status < 300) {
-          const catboxUrl = xhr.responseText.trim();
-          if (catboxUrl.startsWith('http')) {
-            await showResult(catboxUrl);
-          } else {
-            alert("Catbox Error: " + catboxUrl);
-          }
+      try {
+        const res = await fetch('/api/send-zip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: latestRawCode,
+            chatId: userId
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("✅ Success! Check your Telegram Bot Inbox for the ZIP file.");
         } else {
-          alert(`Server Error (${xhr.status}): ` + xhr.responseText);
+          alert("Failed: " + data.error);
         }
-      };
-
-      xhr.onerror = () => {
-        uploadBtn.disabled = false;
-        uploadBtn.classList.remove('opacity-50');
-        progressBox.classList.add('hidden');
-        alert("নেটওয়ার্ক এরর: সার্ভারে কানেক্ট করা যাচ্ছে না!");
-      };
-
-      xhr.send(formData);
-    }
-
-    async function showResult(url) {
-      const resultBox = document.getElementById('resultBox');
-      const resultUrl = document.getElementById('resultUrl');
-      const previewArea = document.getElementById('previewArea');
-
-      resultBox.classList.remove('hidden');
-      resultUrl.value = url;
-      previewArea.innerHTML = '';
-
-      const ext = url.split('.').pop().toLowerCase();
-
-      // ১. ছবি প্রিভিউ (PNG, JPG, etc.)
-      if (['jpeg', 'jpg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-        previewArea.innerHTML = `<img src="${url}" class="max-h-48 object-contain rounded-lg shadow" alt="Preview" />`;
-      }
-      // ২. ভিডিও প্রিভিউ (WebM, MP4)
-      else if (['webm', 'mp4', 'mov'].includes(ext)) {
-        previewArea.innerHTML = `
-          <video controls autoplay loop muted playsinline class="max-h-48 rounded-lg shadow">
-            <source src="${url}" type="video/${ext === 'mov' ? 'mp4' : ext}">
-          </video>`;
-      }
-      // ৩. টেলিগ্রাম অ্যানিমেটেড স্টিকার (.tgs)
-      else if (ext === 'tgs') {
-        previewArea.innerHTML = `<div id="tgsContainer" style="width: 140px; height: 140px;"></div>`;
-        try {
-          const arrayBuffer = await selectedFile.arrayBuffer();
-          const decompressed = pako.inflate(new Uint8Array(arrayBuffer));
-          const jsonString = new TextDecoder("utf-8").decode(decompressed);
-          const animationData = JSON.parse(jsonString);
-
-          lottie.loadAnimation({
-            container: document.getElementById('tgsContainer'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            animationData: animationData
-          });
-        } catch (e) {
-          previewArea.innerHTML = `<span class="text-xs text-emerald-400 font-mono">✅ Telegram Sticker uploaded!</span>`;
-        }
-      }
-      else {
-        previewArea.innerHTML = `<a href="${url}" target="_blank" class="text-xs text-cyan-400 underline font-mono p-2">Click to open/download file ↗</a>`;
+      } catch (err) {
+        alert("Error sending ZIP: " + err.message);
       }
     }
 
-    function copyLink() {
-      const urlInput = document.getElementById('resultUrl');
-      urlInput.select();
-      navigator.clipboard.writeText(urlInput.value);
-
-      const copyBtn = document.getElementById('copyBtn');
-      copyBtn.innerText = "Copied! ✅";
-      setTimeout(() => { copyBtn.innerText = "Copy Link"; }, 2000);
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
   </script>
 </body>
