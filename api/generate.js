@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // মেথড চেক
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -14,21 +13,24 @@ export default async function handler(req, res) {
   const GEMINI_API_KEY = rawKey.trim();
 
   try {
+    // ==========================================
     // ১. ফটো জেনারেশন
+    // ==========================================
     if (category === 'photo') {
       const fallbackUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true`;
       return res.status(200).json({ type: 'image', result: fallbackUrl });
     }
 
-    // ২. কোডিং ও চ্যাট
+    // ==========================================
+    // ২. গুগলের নতুন Interactions API ও gemini-3.8-flash
+    // ==========================================
     let userPrompt = prompt;
     if (category === 'coding') {
       userPrompt = `You are an elite developer. Provide complete, runnable single-file HTML/CSS/JavaScript code inside \`\`\`html ... \`\`\` block.\nUser Request: ${prompt}`;
     }
 
-    // গুগলের অফিশিয়াল স্টেবল এন্ডপয়েন্ট
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/interactions?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 
@@ -36,11 +38,17 @@ export default async function handler(req, res) {
           'x-goog-api-key': GEMINI_API_KEY
         },
         body: JSON.stringify({
-          contents: [
+          model: "models/gemini-3.8-flash",
+          input: userPrompt,
+          tools: [
             {
-              parts: [{ text: userPrompt }]
+              type: "google_search"
             }
-          ]
+          ],
+          generation_config: {
+            max_output_tokens: 65536,
+            thinking_level: "high"
+          }
         })
       }
     );
@@ -51,7 +59,34 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: `Google API Error: ${data.error.message}` });
     }
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "গুগল কোনো টেক্সট দেয়নি।";
+    // Interactions API-এর steps থেকে উত্তর বের করা
+    let reply = "";
+    if (data.steps && data.steps.length > 0) {
+      const lastStep = data.steps[data.steps.length - 1];
+
+      if (typeof lastStep === 'string') {
+        reply = lastStep;
+      } else if (lastStep.text) {
+        reply = lastStep.text;
+      } else if (lastStep.content) {
+        if (typeof lastStep.content === 'string') {
+          reply = lastStep.content;
+        } else if (lastStep.content.parts) {
+          reply = lastStep.content.parts.map(p => p.text || '').join('\n');
+        }
+      } else if (lastStep.parts) {
+        reply = lastStep.parts.map(p => p.text || '').join('\n');
+      } else {
+        reply = JSON.stringify(lastStep);
+      }
+    } else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      reply = data.candidates[0].content.parts[0].text;
+    } else if (data.output) {
+      reply = typeof data.output === 'string' ? data.output : JSON.stringify(data.output);
+    } else {
+      reply = "গুগল কোনো টেক্সট পাঠায়নি। অনুগ্রহ করে আবার চেষ্টা করুন।";
+    }
+
     return res.status(200).json({ type: 'text', result: reply });
 
   } catch (error) {
