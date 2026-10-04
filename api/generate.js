@@ -4,65 +4,71 @@ export default async function handler(req, res) {
   }
 
   const { prompt, category } = req.body;
+  const rawKey = process.env.GEMINI_API_KEY;
 
-  // Vercel Environment Variables থেকে সিক্রেট কী রিড করবে
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-  if (!GEMINI_API_KEY) {
+  if (!rawKey) {
     return res.status(500).json({ 
-      error: 'Vercel Environment Variables-এ GEMINI_API_KEY সেট করা হয়নি!' 
+      error: 'Vercel-এ GEMINI_API_KEY সেট করা নেই! দয়া করে Environment Variables চেক করুন।' 
     });
   }
 
+  // কোনো বাড়তি স্পেস থাকলে তা মুছে ফেলা (.trim)
+  const GEMINI_API_KEY = rawKey.trim();
+
   try {
-    // ১. ফটো ক্যাটাগরি (গুগলের Imagen 3 দিয়ে তৈরি)
+    // ==========================================
+    // ১. ফটো জেনারেশন
+    // ==========================================
     if (category === 'photo') {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-goog-api-key': GEMINI_API_KEY
+          },
           body: JSON.stringify({
             instances: [{ prompt: prompt }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: "1:1",
-              outputMimeType: "image/jpeg"
-            }
+            parameters: { sampleCount: 1, aspectRatio: "1:1", outputMimeType: "image/jpeg" }
           })
         }
       );
 
       const data = await response.json();
+      if (data.error) {
+        return res.status(400).json({ error: `গুগল ইমেজ এরর: ${data.error.message}` });
+      }
 
-      if (data.predictions && data.predictions[0]?.bytesBase64Encoded) {
-        const base64Data = data.predictions[0].bytesBase64Encoded;
+      if (data.predictions?.[0]?.bytesBase64Encoded) {
         return res.status(200).json({ 
           type: 'image', 
-          result: `data:image/jpeg;base64,${base64Data}` 
-        });
-      } else {
-        return res.status(400).json({ 
-          error: data.error?.message || "ছবি তৈরি করা যায়নি। প্রম্পট পরিবর্তন করে আবার চেষ্টা করুন।" 
+          result: `data:image/jpeg;base64,${data.predictions[0].bytesBase64Encoded}` 
         });
       }
+      return res.status(400).json({ error: "ছবি তৈরি করা যায়নি।" });
     }
 
-    // ২. কোডিং ও চ্যাট (Gemini 1.5 Flash মডেল)
+    // ==========================================
+    // ২. কোডিং ও চ্যাট (x-goog-api-key হেডারসহ)
+    // ==========================================
     let systemInstruction = "";
     if (category === 'coding') {
-      systemInstruction = "You are an elite developer. If user asks for any web design or app, provide full runnable single-file HTML/CSS/JavaScript code inside ```html ... ``` block.";
+      systemInstruction = "You are an elite developer. If user asks for any web design or app, provide full runnable single-file HTML/CSS/JavaScript code inside ```html ... ``` block.\n";
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY
+        },
         body: JSON.stringify({
           contents: [
             {
-              parts: [{ text: `${systemInstruction}\nUser prompt: ${prompt}` }]
+              parts: [{ text: `${systemInstruction}User prompt: ${prompt}` }]
             }
           ]
         })
@@ -70,10 +76,22 @@ export default async function handler(req, res) {
     );
 
     const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "কোনো উত্তর পাওয়া যায়নি।";
+
+    // গুগল কোনো এরর দিলে সরাসরি সেই এরর স্ক্রিনে দেখাবে
+    if (data.error) {
+      return res.status(400).json({ 
+        error: `Google API Error: ${data.error.message} (Code: ${data.error.code})` 
+      });
+    }
+
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!reply) {
+      return res.status(200).json({ type: 'text', result: "গুগল কোনো টেক্সট ফেরত দেয়নি।" });
+    }
+
     return res.status(200).json({ type: 'text', result: reply });
 
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "সার্ভার এরর: " + error.message });
   }
 }
