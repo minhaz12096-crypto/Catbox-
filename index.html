@@ -1,441 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Gemini Ultra Glossy 3D</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0a0f1d 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 16px;
-      color: #fff;
-    }
-
-    /* Glossy 3D Header Card */
-    .glossy-card {
-      position: relative;
-      background: linear-gradient(180deg, #2b3952 0%, #172033 100%);
-      border-radius: 26px;
-      padding: 20px 16px;
-      text-align: center;
-      margin-bottom: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 
-        0 8px 0 #0d1320,
-        0 18px 30px rgba(0, 0, 0, 0.5),
-        inset 0 1px 2px rgba(255, 255, 255, 0.6);
-      overflow: hidden;
-    }
-    .glossy-card::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 6px;
-      right: 6px;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.03) 100%);
-      border-radius: 22px 22px 50% 50% / 22px 22px 15% 15%;
-      pointer-events: none;
-    }
-    .glossy-card h1 {
-      font-size: 21px;
-      font-weight: 800;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.6);
-      margin-bottom: 5px;
-    }
-    .glossy-card p {
-      font-size: 13px;
-      color: #cbd5e1;
-      font-weight: 500;
-    }
-
-    /* Glossy 3D Category Buttons */
-    .cat-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .glossy-btn {
-      flex: 1;
-      position: relative;
-      padding: 13px 6px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #ffffff;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      transition: all 0.1s ease;
-      overflow: hidden;
-      background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
-      box-shadow: 
-        0 6px 0 #0f172a,
-        0 10px 18px rgba(0, 0, 0, 0.35),
-        inset 0 1px 1px rgba(255, 255, 255, 0.5);
-    }
-    .glossy-btn::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      right: 3px;
-      height: 48%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.08) 100%);
-      border-radius: 17px 17px 50% 50% / 17px 17px 20% 20%;
-      pointer-events: none;
-    }
-    .glossy-btn:active {
-      transform: translateY(5px);
-      box-shadow: 
-        0 1px 0 #0f172a,
-        0 4px 8px rgba(0, 0, 0, 0.4),
-        inset 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
-    .glossy-btn.active {
-      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-      box-shadow: 
-        0 6px 0 #0369a1,
-        0 12px 22px rgba(2, 132, 199, 0.5),
-        inset 0 1px 2px rgba(255, 255, 255, 0.9);
-    }
-
-    /* Glossy Success Toast */
-    #toast {
-      display: none;
-      position: relative;
-      background: linear-gradient(180deg, #10b981 0%, #047857 100%);
-      color: #ffffff;
-      padding: 10px 16px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 
-        0 5px 0 #064e3b,
-        0 10px 20px rgba(16, 185, 129, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.8);
-      overflow: hidden;
-      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    /* Output Display Box */
-    #output-box {
-      flex: 1;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      border-radius: 24px;
-      padding: 16px;
-      overflow-y: auto;
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 14px;
-      min-height: 240px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 
-        0 6px 0 #0a0f1a,
-        inset 0 2px 6px rgba(0, 0, 0, 0.6);
-    }
-    #output-box pre {
-      background: #000000bb;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 14px;
-      padding: 12px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      font-family: monospace;
-      font-size: 13px;
-    }
-    #output-box img {
-      width: 100%;
-      border-radius: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-
-    /* Action Buttons (ZIP & Preview) */
-    .action-bar {
-      display: none;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .action-btn {
-      flex: 1;
-      position: relative;
-      padding: 12px;
-      border-radius: 18px;
-      font-weight: 800;
-      font-size: 12px;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      overflow: hidden;
-      transition: all 0.1s ease;
-    }
-    .preview-btn {
-      background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-      box-shadow: 0 5px 0 #047857, 0 10px 15px rgba(16, 185, 129, 0.4), inset 0 1px 1px #fff;
-    }
-    .preview-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #047857;
-    }
-    .zip-btn {
-      background: linear-gradient(180deg, #f43f5e 0%, #e11d48 100%);
-      box-shadow: 0 5px 0 #9f1239, 0 10px 15px rgba(244, 63, 94, 0.4), inset 0 1px 1px #fff;
-    }
-    .zip-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #9f1239;
-    }
-
-    /* Input & Send */
-    .input-box {
-      display: flex;
-      gap: 10px;
-    }
-    input {
-      flex: 1;
-      background: #1e293b;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 14px 16px;
-      border-radius: 20px;
-      color: #fff;
-      font-size: 14px;
-      outline: none;
-      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
-    }
-    .send-btn {
-      position: relative;
-      padding: 14px 22px;
-      border-radius: 20px;
-      background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
-      box-shadow: 0 5px 0 #312e81, 0 10px 20px rgba(99, 102, 241, 0.4), inset 0 1px 1px #fff;
-      border: none;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      overflow: hidden;
-      transition: all 0.1s ease;
-    }
-    .send-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 1px 0 #312e81;
-    }
-
-    /* Modal */
-    #preview-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 9999;
-      flex-direction: column;
-    }
-    #preview-modal header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 18px;
-      background: #111827;
-      border-bottom: 1px solid #374151;
-    }
-    #preview-iframe {
-      flex: 1;
-      width: 100%;
-      border: none;
-      background: #fff;
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.9); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Broadcast & Pin Panel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #1e293b;
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #334155;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #38bdf8;
+            font-size: 22px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #38bdf8;
+        }
+        textarea {
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0f172a;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 12px;
+        }
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            accent-color: #38bdf8;
+            cursor: pointer;
+        }
+        .btn-config {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #475569;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .color-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .color-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .color-primary { color: #38bdf8; }
+        .color-success { color: #4ade80; }
+        .color-danger { color: #f87171; }
+        
+        .send-btn {
+            width: 100%;
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .send-btn:hover {
+            background: #0369a1;
+        }
+        .status-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+            line-height: 1.5;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .log-success { color: #4ade80; }
+        .log-error { color: #f87171; }
+        .tag-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="glossy-card">
-    <h1>Welcome to Gemini Ultra Studio</h1>
-    <p>Select your mode to generate code, photos, or chat</p>
-  </div>
+<div class="container">
+    <h2>🚀 Telegram Broadcast & Pin Panel</h2>
 
-  <div class="cat-container">
-    <button class="glossy-btn active" onclick="setCategory('coding', this)">💻 Coding</button>
-    <button class="glossy-btn" onclick="setCategory('photo', this)">🎨 Photo</button>
-    <button class="glossy-btn" onclick="setCategory('chat', this)">💬 Chat</button>
-  </div>
+    <!-- Bot Token -->
+    <div class="form-group">
+        <label>🤖 Bot Token:</label>
+        <input type="text" id="botToken" placeholder="123456789:AAFx...">
+    </div>
 
-  <div id="toast">✨ Mode activated successfully!</div>
+    <!-- User IDs -->
+    <div class="form-group">
+        <label>👥 Target User / Channel IDs (প্রতি লাইনে ১টি করে আইডি বা কমা দিয়ে দিন):</label>
+        <textarea id="targetIds" rows="3" placeholder="1234567890&#10;987654321&#10;@channel_username"></textarea>
+    </div>
 
-  <div id="output-box">
-    Hello! I am ready. What would you like to build or generate?
-  </div>
+    <!-- Message Text (HTML) -->
+    <div class="form-group">
+        <label>📝 Message Text (HTML Format Support):</label>
+        <textarea id="messageText" rows="4" placeholder="<b>Bold</b>, <i>Italic</i>, বা <a href='https://link.com'>Link Text</a>"></textarea>
+        <div class="tag-hint">সাপোর্টেড ট্যাগ: &lt;b&gt;, &lt;i&gt;, &lt;a href="..."&gt;, &lt;code&gt;</div>
+    </div>
 
-  <div class="action-bar" id="actionBar">
-    <button class="action-btn preview-btn" onclick="openPreview()">🌐 Live HTML Preview</button>
-    <button class="action-btn zip-btn" onclick="sendZipToBot()">📦 Send ZIP to Bot Inbox</button>
-  </div>
+    <!-- Pin Message Checkbox -->
+    <label class="checkbox-group">
+        <input type="checkbox" id="pinMessageCheck">
+        <span>📌 পিন মেসেজ (মেসেজ যাওয়ার সাথে সাথে Pin হবে)</span>
+    </label>
 
-  <div class="input-box">
-    <input type="text" id="userInput" placeholder="Ask for code, images, questions..." />
-    <button class="send-btn" onclick="submitPrompt()">SEND</button>
-  </div>
+    <!-- Inline Button Checkbox -->
+    <label class="checkbox-group">
+        <input type="checkbox" id="inlineBtnCheck" onchange="toggleButtonConfig()">
+        <span>🔘 ইনলাইন বাটন যোগ করুন (Inline Button)</span>
+    </label>
 
-  <div id="preview-modal">
-    <header>
-      <span style="font-weight: 800; font-size: 15px;">🌐 Live Website Preview</span>
-      <button class="glossy-btn" style="padding: 6px 16px; flex: none;" onclick="closePreview()">✕ Close</button>
-    </header>
-    <iframe id="preview-iframe"></iframe>
-  </div>
+    <!-- Inline Button Settings Box -->
+    <div class="btn-config" id="btnConfigBox">
+        <div class="form-group">
+            <label>বাটন টেক্সট (Button Text):</label>
+            <input type="text" id="btnText" placeholder="যেমন: Visit Channel">
+        </div>
+        <div class="form-group">
+            <label>বাটন লিংক (Button URL):</label>
+            <input type="text" id="btnUrl" placeholder="https://t.me/...">
+        </div>
+        <label>বাটন কালার সিলেক্ট করুন (টিক না দিলে সাধারণ ডিফল্ট হবে):</label>
+        <div class="color-options">
+            <label class="color-label">
+                <input type="radio" name="btnColor" value="" checked>
+                <span>ডিফল্ট (কোনো কালার না)</span>
+            </label>
+            <label class="color-label color-primary">
+                <input type="radio" name="btnColor" value="primary">
+                <span>🔵 Primary (নীল)</span>
+            </label>
+            <label class="color-label color-success">
+                <input type="radio" name="btnColor" value="success">
+                <span>🟢 Success (সবুজ)</span>
+            </label>
+            <label class="color-label color-danger">
+                <input type="radio" name="btnColor" value="danger">
+                <span>🔴 Danger (লাল)</span>
+            </label>
+        </div>
+    </div>
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) tg.expand();
+    <!-- Send Button -->
+    <button class="send-btn" id="sendBtn" onclick="startBroadcast()">🚀 Send & Broadcast</button>
 
-    let currentCategory = 'coding';
-    let latestRawCode = "";
+    <!-- Status Box -->
+    <div class="status-box" id="statusBox"></div>
+</div>
 
-    function setCategory(cat, element) {
-      currentCategory = cat;
-      document.querySelectorAll('.glossy-btn').forEach(b => b.classList.remove('active'));
-      element.classList.add('active');
+<script>
+    // LocalStorage থেকে টোকেন সেভ রাখা
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedToken = localStorage.getItem("tg_bot_token");
+        if (savedToken) document.getElementById("botToken").value = savedToken;
+    });
 
-      const toast = document.getElementById("toast");
-      toast.style.display = "block";
-      toast.innerText = `✨ ${cat.toUpperCase()} mode activated successfully!`;
-
-      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-      setTimeout(() => { toast.style.display = "none"; }, 2500);
+    function toggleButtonConfig() {
+        const isChecked = document.getElementById("inlineBtnCheck").checked;
+        document.getElementById("btnConfigBox").style.display = isChecked ? "block" : "none";
     }
 
-    async function submitPrompt() {
-      const input = document.getElementById("userInput");
-      const prompt = input.value.trim();
-      if (!prompt) return;
+    async function startBroadcast() {
+        const token = document.getElementById("botToken").value.trim();
+        const idsRaw = document.getElementById("targetIds").value.trim();
+        const text = document.getElementById("messageText").value.trim();
+        const isPin = document.getElementById("pinMessageCheck").checked;
+        const hasBtn = document.getElementById("inlineBtnCheck").checked;
+        const btnText = document.getElementById("btnText").value.trim();
+        const btnUrl = document.getElementById("btnUrl").value.trim();
+        const selectedColor = document.querySelector('input[name="btnColor"]:checked').value;
+        const statusBox = document.getElementById("statusBox");
+        const sendBtn = document.getElementById("sendBtn");
 
-      const output = document.getElementById("output-box");
-      const actionBar = document.getElementById("actionBar");
-      actionBar.style.display = "none";
+        if (!token) return alert("দয়া করে Bot Token দিন!");
+        if (!idsRaw) return alert("দয়া করে অন্তত ১টি User ID বা Channel দিন!");
+        if (!text) return alert("মেসেজ টেক্সট খালি রাখা যাবে না!");
 
-      output.innerHTML = `<em>✨ Generating ${currentCategory.toUpperCase()}... Please wait...</em>`;
-      input.value = "";
+        localStorage.setItem("tg_bot_token", token);
 
-      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        const ids = idsRaw.split(/[\n,]+/).map(id => id.trim()).filter(id => id.length > 0);
 
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, category: currentCategory })
-        });
-        
-        const data = await res.json();
+        statusBox.style.display = "block";
+        statusBox.style.background = "#0f172a";
+        statusBox.innerHTML = `⏳ ব্রডকাস্ট শুরু হচ্ছে... মোট টার্গেট: ${ids.length} জন<br>`;
+        sendBtn.disabled = true;
 
-        // ১. যদি সার্ভার কোনো এরর দেয়, সরাসরি লাল রঙে দেখাবে
-        if (data.error) {
-          output.innerHTML = `<span style="color: #f87171; font-weight: bold;">⚠️ Error: ${escapeHtml(data.error)}</span>`;
-          return;
+        let successCount = 0;
+        let failCount = 0;
+
+        for (let i = 0; i < ids.length; i++) {
+            const chatId = ids[i];
+
+            // মেসেজ পেলোড তৈরি
+            const payload = {
+                chat_id: chatId,
+                text: text,
+                parse_mode: "HTML"
+            };
+
+            // বাটন থাকলে বাটন যোগ করা
+            if (hasBtn && btnText && btnUrl) {
+                const btnObj = { text: btnText, url: btnUrl };
+                if (selectedColor) {
+                    btnObj.style = selectedColor; // primary / success / danger
+                }
+                payload.reply_markup = {
+                    inline_keyboard: [[btnObj]]
+                };
+            }
+
+            try {
+                // ১. মেসেজ পাঠানো
+                const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const resData = await response.json();
+
+                if (resData.ok) {
+                    successCount++;
+                    statusBox.innerHTML += `<span class="log-success">✅ [${i+1}/${ids.length}] Sent to ${chatId}</span><br>`;
+
+                    // ২. পিন অপশন অন থাকলে মেসেজ পিন করা
+                    if (isPin && resData.result && resData.result.message_id) {
+                        await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                chat_id: chatId,
+                                message_id: resData.result.message_id
+                            })
+                        });
+                    }
+                } else {
+                    failCount++;
+                    statusBox.innerHTML += `<span class="log-error">❌ [${i+1}/${ids.length}] Failed to ${chatId}: ${resData.description}</span><br>`;
+                }
+            } catch (err) {
+                failCount++;
+                statusBox.innerHTML += `<span class="log-error">❌ Network Error for ${chatId}</span><br>`;
+            }
+
+            // টেলিগ্রাম ফ্লাড লিমিট এড়াতে প্রতি মেসেজের মাঝে সামান্য বিরতি
+            await new Promise(r => setTimeout(r, 80));
+            statusBox.scrollTop = statusBox.scrollHeight;
         }
 
-        // ২. যদি ফটো রিটার্ন করে
-        if (data.type === 'image') {
-          output.innerHTML = `<img src="${data.result}" alt="Generated Photo" />`;
-        } 
-        // ৩. টেক্সট বা কোড রিটার্ন করলে
-        else {
-          const content = data.result || "No content returned.";
-          output.innerHTML = `<pre>${escapeHtml(content)}</pre>`;
-          latestRawCode = extractHtmlCode(content);
-
-          if (latestRawCode || currentCategory === 'coding') {
-            actionBar.style.display = "flex";
-          }
-        }
-      } catch (err) {
-        output.innerHTML = `<span style="color: #f87171; font-weight: bold;">⚠️ App Error: ${escapeHtml(err.message)}</span>`;
-      }
+        statusBox.innerHTML += `<br><b>🎉 সম্পন্ন হয়েছে! সফল: ${successCount}, ব্যর্থ: ${failCount}</b>`;
+        sendBtn.disabled = false;
     }
+</script>
 
-    function extractHtmlCode(text) {
-      if (!text) return "";
-      const match = text.match(/```html([\s\S]*?)```/i) || text.match(/```([\s\S]*?)```/i);
-      return match ? match[1].trim() : text;
-    }
-
-    function openPreview() {
-      if (!latestRawCode) return alert("No HTML code to preview!");
-      const modal = document.getElementById("preview-modal");
-      const iframe = document.getElementById("preview-iframe");
-      modal.style.display = "flex";
-      iframe.srcdoc = latestRawCode;
-    }
-
-    function closePreview() {
-      document.getElementById("preview-modal").style.display = "none";
-    }
-
-    async function sendZipToBot() {
-      const userId = tg?.initDataUnsafe?.user?.id;
-      if (!userId) {
-        alert("টেলিগ্রাম থেকে ওপেন করুন যাতে আপনার Chat ID পাওয়া যায়।");
-        return;
-      }
-
-      alert("Creating ZIP and sending to your Telegram Bot Inbox...");
-
-      try {
-        const res = await fetch('/api/send-zip', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: latestRawCode,
-            chatId: userId
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert("✅ Success! Check your Telegram Bot Inbox for the ZIP file.");
-        } else {
-          alert("Failed: " + data.error);
-        }
-      } catch (err) {
-        alert("Error sending ZIP: " + err.message);
-      }
-    }
-
-    // এরর প্রতিরোধক সেফ escapeHtml ফাংশন
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-  </script>
 </body>
 </html>
