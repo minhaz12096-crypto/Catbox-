@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Bot Mini App Panel</title>
+    <title>Auto Telegram Broadcast Panel (No ID Needed)</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; padding: 15px; display: flex; justify-content: center; }
-        .card { background: #1e293b; width: 100%; max-width: 500px; padding: 20px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #0b1329; color: #f1f5f9; padding: 15px; display: flex; justify-content: center; }
+        .card { background: #1e293b; width: 100%; max-width: 480px; padding: 20px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
         h3 { text-align: center; color: #38bdf8; margin-bottom: 15px; font-size: 20px; }
-        .input-box, textarea { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; }
-        .input-box:focus, textarea:focus { border-color: #38bdf8; }
         
+        .input-box, textarea { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; transition: 0.2s; }
+        .input-box:focus, textarea:focus { border-color: #38bdf8; }
+
         .token-group { display: flex; gap: 8px; margin-bottom: 12px; }
         .btn-refresh { background: #10b981; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        .bot-status { background: #334155; padding: 8px 12px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 15px; color: #cbd5e1; }
-        
+        .btn-refresh:hover { background: #059669; }
+
+        .bot-status { background: #0f172a; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 12px; border: 1px solid #334155; color: #94a3b8; }
+        .user-counter { background: #1e3a8a; color: #93c5fd; padding: 8px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 15px; border: 1px solid #3b82f6; }
+
         .checkbox-container { display: flex; gap: 12px; background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #334155; flex-wrap: wrap; }
         label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; user-select: none; }
         input[type="checkbox"], input[type="radio"] { accent-color: #38bdf8; width: 16px; height: 16px; }
@@ -24,10 +27,11 @@
         .btn-config { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px dashed #475569; margin-bottom: 15px; display: none; }
         .color-row { display: flex; gap: 10px; margin-top: 8px; font-size: 13px; flex-wrap: wrap; }
 
-        .btn-submit { width: 100%; background: #0284c7; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .btn-submit:hover { background: #0369a1; }
-        
-        .log-box { margin-top: 15px; padding: 10px; border-radius: 8px; font-size: 13px; max-height: 140px; overflow-y: auto; background: #0f172a; display: none; border: 1px solid #334155; }
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #0284c7, #2563eb); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(37,99,235,0.4); }
+        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:disabled { background: #475569; cursor: not-allowed; box-shadow: none; }
+
+        .log-box { margin-top: 15px; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 150px; overflow-y: auto; background: #0f172a; display: none; border: 1px solid #334155; line-height: 1.6; }
         .success { color: #4ade80; }
         .fail { color: #f87171; }
     </style>
@@ -35,41 +39,40 @@
 <body>
 
 <div class="card">
-    <h3>🚀 Telegram Broadcast Panel</h3>
+    <h3>📢 Auto Broadcast Panel</h3>
     
-    <!-- Bot Status -->
-    <div class="bot-status" id="botStatus">বট চেক করা হয়নি (টোকেন দিন)</div>
+    <!-- Bot Connection Status -->
+    <div class="bot-status" id="botStatus">বট টোকেন দিন এবং Refresh করুন</div>
 
-    <!-- Token Input & Refresh -->
+    <!-- Auto Users Found Counter -->
+    <div class="user-counter" id="userCounter">👥 মোট সক্রিয় ইউজার: ০ জন (খোঁজা হয়নি)</div>
+
+    <!-- Bot Token Input -->
     <div class="token-group">
-        <input type="text" id="botToken" class="input-box" style="margin-bottom:0;" placeholder="Bot Token দিন...">
-        <button class="btn-refresh" onclick="checkBotToken()">🔄 Refresh</button>
+        <input type="text" id="botToken" class="input-box" style="margin-bottom:0;" placeholder="আপনার বটের টোকেন পেস্ট করুন...">
+        <button class="btn-refresh" onclick="connectBot()">🔄 Refresh</button>
     </div>
 
-    <!-- User / Target IDs -->
-    <label style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">User IDs (একবার লিখলে ব্রাউজারে সেভ থাকবে):</label>
-    <textarea id="targetIds" rows="2" placeholder="123456789&#10;987654321&#10;@channel_username"></textarea>
-
     <!-- Message Input -->
-    <label style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">আপনার মেসেজ (কোনো কোড লেখার দরকার নেই):</label>
-    <textarea id="msgText" rows="4" placeholder="এখানে যা লিখবেন হুবহু তাই যাবে..."></textarea>
+    <label style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">আপনার মেসেজ লিখুন:</label>
+    <textarea id="msgText" rows="4" placeholder="এখানে মেসেজ লিখুন (কোনো কোড লেখার দরকার নেই)..."></textarea>
 
-    <!-- Style Checkboxes (টিক মার্ক অপশন) -->
+    <!-- Style Checkboxes (টিক মার্ক সিস্টেম) -->
     <div class="checkbox-container">
         <label><input type="checkbox" id="boldCheck"> <b>Bold (বোল্ড)</b></label>
         <label><input type="checkbox" id="italicCheck"> <i>Italic (ইটালিক)</i></label>
         <label><input type="checkbox" id="pinCheck"> 📌 Pin Message</label>
     </div>
 
-    <!-- Inline Button Checkbox -->
+    <!-- Inline Button Option -->
     <label style="margin-bottom: 10px;"><input type="checkbox" id="btnToggle" onchange="toggleButtonBox()"> 🔘 ইনলাইন বাটন যোগ করুন</label>
 
-    <!-- Button Settings Box -->
+    <!-- Button Config Box -->
     <div class="btn-config" id="btnConfig">
-        <input type="text" id="btnText" class="input-box" placeholder="বাটনের নাম (যেমন: Join Channel)">
+        <input type="text" id="btnText" class="input-box" placeholder="বাটনের নাম (যেমন: Join Community)">
         <input type="text" id="btnUrl" class="input-box" placeholder="বাটনের লিংক (https://t.me/...)">
         
-        <span style="font-size: 13px; color: #94a3b8;">বাটন কালার সিলেক্ট করুন:</span>
+        <span style="font-size: 13px; color: #94a3b8;">বাটন কালার:</span>
         <div class="color-row">
             <label><input type="radio" name="btnColor" value="" checked> Default</label>
             <label style="color:#38bdf8;"><input type="radio" name="btnColor" value="primary"> 🔵 Blue</label>
@@ -78,32 +81,23 @@
         </div>
     </div>
 
-    <!-- Submit Button -->
-    <button class="btn-submit" id="submitBtn" onclick="sendBroadcast()">📢 Send to Users (মেসেজ পাঠান)</button>
+    <!-- Broadcast Button -->
+    <button class="btn-submit" id="submitBtn" onclick="autoBroadcast()">🚀 Send To All Users (সবার কাছে পাঠান)</button>
 
     <!-- Logs -->
     <div class="log-box" id="logBox"></div>
 </div>
 
 <script>
-    // নিরাপদ HTML রূপান্তর
     function escapeHtml(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // অটো সেভ থেকে ডাটা লোড
     window.onload = function() {
-        const savedToken = localStorage.getItem("tg_panel_token");
-        const savedIds = localStorage.getItem("tg_panel_ids");
+        const savedToken = localStorage.getItem("auto_panel_token");
         if (savedToken) {
             document.getElementById("botToken").value = savedToken;
-            checkBotToken();
-        }
-        if (savedIds) {
-            document.getElementById("targetIds").value = savedIds;
+            connectBot();
         }
     };
 
@@ -111,40 +105,73 @@
         document.getElementById("btnConfig").style.display = document.getElementById("btnToggle").checked ? "block" : "none";
     }
 
-    // টোকেন রিফ্রেশ ও বট ইনফো চেক
-    async function checkBotToken() {
+    // বটের টোকেন কানেক্ট ও ইউজার ডাটাবেজ আপডেট
+    async function connectBot() {
         const token = document.getElementById("botToken").value.trim();
         const status = document.getElementById("botStatus");
-        if (!token) return alert("বট টোকেন দিন!");
+        const counter = document.getElementById("userCounter");
+        if (!token) return alert("দয়া করে Bot Token দিন!");
 
-        status.innerText = "⏳ বট কানেক্ট হচ্ছে...";
+        status.innerText = "⏳ টেলিগ্রাম সার্ভার চেক হচ্ছে...";
         try {
             const res = await fetch(`https://api.telegram.org/bot${token}/getMe`);
             const data = await res.json();
             if (data.ok) {
-                localStorage.setItem("tg_panel_token", token);
+                localStorage.setItem("auto_panel_token", token);
                 status.innerText = `✅ কানেক্টেড: ${data.result.first_name} (@${data.result.username})`;
                 status.style.color = "#4ade80";
+
+                // টেলিগ্রাম থেকে ইউজার হিস্ট্রি অটো লোড করা
+                await fetchAndCacheUsers(token);
             } else {
                 status.innerText = `❌ ভুল টোকেন: ${data.description}`;
                 status.style.color = "#f87171";
             }
         } catch (e) {
-            status.innerText = "❌ ইন্টারনেট বা কানেকশন সমস্যা";
+            status.innerText = "❌ কানেকশন সমস্যা!";
             status.style.color = "#f87171";
         }
     }
 
-    // মেসেজ ব্রডকাস্ট ইঞ্জিন
-    async function sendBroadcast() {
+    // কোনো আইডি ছাড়াই টেলিগ্রামের সার্ভার থেকে ইউজারদের আইডি সংগ্রহ করার ফাংশন
+    async function fetchAndCacheUsers(token) {
+        const storageKey = `cached_users_${token}`;
+        let cachedUsers = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
+
+        try {
+            // যদি পূর্বে ওয়েবহুক থাকে তবে getUpdates পেতে ওয়েবহুক সাময়িক ড্রপ
+            await fetch(`https://api.telegram.org/bot${token}/deleteWebhook`);
+            
+            const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100`);
+            const data = await res.json();
+
+            if (data.ok && Array.isArray(data.result)) {
+                data.result.forEach(update => {
+                    if (update.message && update.message.chat) cachedUsers.add(update.message.chat.id);
+                    if (update.callback_query && update.callback_query.message && update.callback_query.message.chat) cachedUsers.add(update.callback_query.message.chat.id);
+                    if (update.my_chat_member && update.my_chat_member.chat) cachedUsers.add(update.my_chat_member.chat.id);
+                    if (update.chat_member && update.chat_member.chat) cachedUsers.add(update.chat_member.chat.id);
+                    if (update.chat_join_request) {
+                        cachedUsers.add(update.chat_join_request.user_chat_id || update.chat_join_request.from.id);
+                    }
+                });
+            }
+        } catch (e) {}
+
+        const userArray = Array.from(cachedUsers);
+        localStorage.setItem(storageKey, JSON.stringify(userArray));
+        document.getElementById("userCounter").innerText = `👥 মোট সক্রিয় ইউজার: ${userArray.length} জন (আইডি ছাড়া প্রস্তুত)`;
+        return userArray;
+    }
+
+    // অটো ব্রডকাস্ট ইঞ্জিন (আইডি টাইপ করতে হবে না)
+    async function autoBroadcast() {
         const token = document.getElementById("botToken").value.trim();
-        const rawIds = document.getElementById("targetIds").value.trim();
         const rawMsg = document.getElementById("msgText").value.trim();
-        
         const isBold = document.getElementById("boldCheck").checked;
         const isItalic = document.getElementById("italicCheck").checked;
         const isPin = document.getElementById("pinCheck").checked;
-        
+
         const hasBtn = document.getElementById("btnToggle").checked;
         const btnText = document.getElementById("btnText").value.trim();
         const btnUrl = document.getElementById("btnUrl").value.trim();
@@ -154,12 +181,16 @@
         const submitBtn = document.getElementById("submitBtn");
 
         if (!token) return alert("বট টোকেন দিন!");
-        if (!rawIds) return alert("অন্তত ১টি User ID বা Channel দিন!");
-        if (!rawMsg) return alert("মেসেজ টেক্সট লিখুন!");
+        if (!rawMsg) return alert("মেসেজ বক্সে কিছু লিখুন!");
 
-        localStorage.setItem("tg_panel_ids", rawIds);
+        // অটোমেটিক ইউজার সংগ্রহ
+        const users = await fetchAndCacheUsers(token);
 
-        // টিক মার্ক অনুযায়ী টেক্সট ফরম্যাট তৈরি (কখনোই ক্র্যাশ করবে না)
+        if (users.length === 0) {
+            return alert("⚠️ কোনো ইউজার পাওয়া যায়নি!\nনতুন কোনো ইউজার দিয়ে বটে অন্তত ১ বার /start দিন, তাহলে সে অটো তালিকায় চলে আসবে।");
+        }
+
+        // টিক মার্ক অনুযায়ী টেক্সট ফরম্যাট তৈরি
         let formattedText = escapeHtml(rawMsg);
         if (isBold) formattedText = `<b>${formattedText}</b>`;
         if (isItalic) formattedText = `<i>${formattedText}</i>`;
@@ -172,16 +203,14 @@
             replyMarkup = { inline_keyboard: [[btn]] };
         }
 
-        const ids = rawIds.split(/[\n,]+/).map(i => i.trim()).filter(i => i.length > 0);
-
         logBox.style.display = "block";
-        logBox.innerHTML = `🚀 মোট ${ids.length} জনের কাছে পাঠানো হচ্ছে...<br>`;
+        logBox.innerHTML = `🚀 মোট ${users.length} জনের কাছে পাঠানো শুরু হচ্ছে...<br>`;
         submitBtn.disabled = true;
 
         let success = 0, fail = 0;
 
-        for (let i = 0; i < ids.length; i++) {
-            const chatId = ids[i];
+        for (let i = 0; i < users.length; i++) {
+            const chatId = users[i];
             const payload = {
                 chat_id: chatId,
                 text: formattedText,
@@ -199,34 +228,30 @@
 
                 if (data.ok) {
                     success++;
-                    logBox.innerHTML += `<span class="success">✅ Sent to ${chatId}</span><br>`;
+                    logBox.innerHTML += `<span class="success">✅ Sent: User (${chatId})</span><br>`;
 
-                    // পিন অপশন অন থাকলে মেসেজ পিন করা
                     if (isPin && data.result && data.result.message_id) {
                         await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                chat_id: chatId,
-                                message_id: data.result.message_id
-                            })
+                            body: JSON.stringify({ chat_id: chatId, message_id: data.result.message_id })
                         });
                     }
                 } else {
                     fail++;
-                    logBox.innerHTML += `<span class="fail">❌ ${chatId}: ${data.description}</span><br>`;
+                    logBox.innerHTML += `<span class="fail">❌ User (${chatId}): ${data.description}</span><br>`;
                 }
             } catch (err) {
                 fail++;
-                logBox.innerHTML += `<span class="fail">❌ Error connecting for ${chatId}</span><br>`;
+                logBox.innerHTML += `<span class="fail">❌ Error connecting to (${chatId})</span><br>`;
             }
 
-            // ফ্লাড লিমিট এড়াতে বিরতি
+            // ফ্লাড রেট এড়াতে বিরতি
             await new Promise(r => setTimeout(r, 60));
             logBox.scrollTop = logBox.scrollHeight;
         }
 
-        logBox.innerHTML += `<br><b>🎉 শেষ হয়েছে! সফল: ${success}, ব্যর্থ: ${fail}</b>`;
+        logBox.innerHTML += `<br><b>🎉 সম্পন্ন! সফল: ${success}, ব্যর্থ: ${fail}</b>`;
         submitBtn.disabled = false;
     }
 </script>
