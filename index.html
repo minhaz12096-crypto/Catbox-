@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Bot Manager & Broadcaster</title>
+    <title>Telegram Multi-Bot Manager & Broadcaster</title>
     <!-- Telegram Mini App Official SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-dark: #0b1120;
-            --card-bg: #152238;
-            --card-border: #1e3a5f;
+            --bg-dark: #080e1a;
+            --card-bg: #111d33;
+            --card-border: #1b2f52;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --primary-blue: #0284c7;
-            --primary-blue-dark: #0369a1;
-            --btn-green: #10b981;
-            --btn-green-dark: #047857;
-            --btn-red: #ef4444;
-            --btn-red-dark: #b91c1c;
+            --blue-grad: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+            --blue-shadow: #0369a1;
+            --green-grad: linear-gradient(180deg, #34d399 0%, #059669 100%);
+            --green-shadow: #047857;
+            --red-grad: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+            --red-shadow: #991b1b;
+            --purple-grad: linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%);
+            --purple-shadow: #5b21b6;
         }
 
         * {
@@ -32,27 +34,26 @@
         body {
             background: var(--bg-dark);
             color: var(--text-main);
-            padding: 14px;
+            padding: 12px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
         }
 
-        .container {
+        .app-wrapper {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
         }
 
-        /* --- Header & Security Badge --- */
-        .header {
+        /* --- Header & Tab Navigation --- */
+        .top-bar {
             text-align: center;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
-        .header h1 {
+        .top-bar h1 {
             font-size: 20px;
             font-weight: 800;
-            letter-spacing: -0.5px;
             color: #38bdf8;
             display: flex;
             align-items: center;
@@ -60,31 +61,37 @@
             gap: 8px;
         }
 
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #34d399;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-top: 6px;
-        }
-
-        /* --- Card Styles --- */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 16px;
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
             margin-bottom: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
 
-        /* --- 3D Glossy Buttons --- */
+        .tab-btn {
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: #0f192c;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            background: #1e3a5f;
+            color: #38bdf8;
+            border-color: #38bdf8;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+        }
+
+        /* --- Glossy 3D Button Styles --- */
         .btn-3d {
             display: inline-flex;
             align-items: center;
@@ -100,12 +107,9 @@
             position: relative;
             transition: all 0.1s ease;
             user-select: none;
-            width: 100%;
             text-align: center;
-            text-decoration: none;
         }
 
-        /* Glossy Top Reflection */
         .btn-3d::after {
             content: '';
             position: absolute;
@@ -119,157 +123,148 @@
         }
 
         .btn-blue {
-            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-            box-shadow: 0 5px 0 #0369a1, 0 8px 15px rgba(2, 132, 199, 0.4);
-            color: #ffffff;
-            padding: 14px 18px;
-            font-size: 15px;
+            background: var(--blue-grad);
+            box-shadow: 0 5px 0 var(--blue-shadow), 0 8px 15px rgba(2, 132, 199, 0.4);
+            color: #fff;
+            padding: 13px 18px;
+            font-size: 14px;
+            width: 100%;
         }
-
         .btn-blue:active {
             transform: translateY(3px);
-            box-shadow: 0 2px 0 #0369a1, 0 4px 8px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 2px 0 var(--blue-shadow);
         }
 
         .btn-green {
-            background: linear-gradient(180deg, #34d399 0%, #059669 100%);
-            box-shadow: 0 4px 0 #047857, 0 6px 12px rgba(5, 150, 105, 0.3);
-            color: #ffffff;
-            padding: 10px 14px;
-            font-size: 13px;
+            background: var(--green-grad);
+            box-shadow: 0 4px 0 var(--green-shadow);
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12px;
         }
-
         .btn-green:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #047857;
+            box-shadow: 0 2px 0 var(--green-shadow);
         }
 
         .btn-red {
-            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
-            box-shadow: 0 4px 0 #991b1b, 0 6px 12px rgba(220, 38, 38, 0.3);
-            color: #ffffff;
-            padding: 8px 12px;
-            font-size: 12px;
+            background: var(--red-grad);
+            box-shadow: 0 4px 0 var(--red-shadow);
+            color: #fff;
+            padding: 7px 10px;
+            font-size: 11px;
         }
-
         .btn-red:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #991b1b;
+            box-shadow: 0 2px 0 var(--red-shadow);
         }
 
-        /* --- Bot Selector Tabs --- */
-        .section-title {
+        .btn-purple {
+            background: var(--purple-grad);
+            box-shadow: 0 4px 0 var(--purple-shadow);
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+        .btn-purple:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--purple-shadow);
+        }
+
+        /* --- Cards & Containers --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .section-header {
             font-size: 13px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .bot-select-row {
-            display: flex;
-            gap: 8px;
+        /* --- Inputs, Selectors & Textareas --- */
+        .form-row {
             margin-bottom: 12px;
         }
 
-        select.custom-select {
-            flex: 1;
-            background: #0f172a;
-            border: 1px solid var(--card-border);
-            color: #fff;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        /* --- Active Bot Info & Stats Badge --- */
-        .bot-stats-card {
-            background: #0b1329;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .bot-meta h4 {
-            font-size: 14px;
-            color: #f8fafc;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .bot-meta span {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .audience-badge {
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            padding: 6px 12px;
-            border-radius: 10px;
-            text-align: right;
-        }
-
-        .audience-badge .num {
-            font-size: 16px;
-            font-weight: 800;
-            color: #38bdf8;
-        }
-
-        .audience-badge .lbl {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        /* --- Inputs & Textareas --- */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        label.field-lbl {
+        .field-lbl {
             font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             display: block;
         }
 
-        .custom-input, textarea.custom-textarea {
+        .c-input, .c-select, textarea.c-textarea {
             width: 100%;
-            background: #0f172a;
+            background: #091222;
             border: 1px solid var(--card-border);
             border-radius: 10px;
-            padding: 12px;
+            padding: 11px 12px;
             color: #fff;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             transition: border-color 0.2s;
         }
 
-        .custom-input:focus, textarea.custom-textarea:focus {
+        .c-input:focus, .c-select:focus, textarea.c-textarea:focus {
             border-color: #38bdf8;
         }
 
-        /* --- Styling Checkboxes --- */
+        /* --- Media Attachment Strip --- */
+        .media-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #091222;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px dashed var(--card-border);
+            margin-bottom: 12px;
+        }
+
+        .file-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1e3a5f;
+            color: #38bdf8;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .selected-file-label {
+            font-size: 12px;
+            color: #34d399;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Formatting Controls Grid --- */
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
-            background: #0f172a;
+            background: #091222;
             padding: 10px;
             border-radius: 10px;
             border: 1px solid var(--card-border);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .control-item {
@@ -287,376 +282,529 @@
             height: 16px;
         }
 
-        /* --- Inline Button Customizer --- */
+        /* --- Inline Button Builder Box --- */
         .btn-builder-box {
-            background: #0f172a;
+            background: #091222;
             border: 1px dashed var(--card-border);
             border-radius: 10px;
             padding: 12px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             display: none;
         }
 
-        .color-picker-row {
+        .color-selector {
             display: flex;
-            gap: 12px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 6px;
             font-size: 12px;
         }
 
-        .color-picker-row label {
+        .color-selector label {
             display: flex;
             align-items: center;
             gap: 4px;
             cursor: pointer;
         }
 
-        /* --- Modal for Adding Tokens --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            z-index: 999;
+        /* --- Settings Lists (Targets & Bots) --- */
+        .asset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 8px;
         }
 
-        .modal-card {
-            background: var(--card-bg);
+        .asset-card {
+            background: #091222;
             border: 1px solid var(--card-border);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-        }
-
-        .modal-header {
+            border-radius: 10px;
+            padding: 10px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
         }
 
-        .modal-header h3 {
-            font-size: 16px;
-            color: #38bdf8;
+        .asset-info strong {
+            font-size: 13px;
+            color: #f8fafc;
+            display: block;
         }
 
-        .modal-close {
-            background: none;
-            border: none;
+        .asset-info span {
+            font-size: 11px;
             color: var(--text-muted);
-            font-size: 20px;
-            cursor: pointer;
         }
 
-        /* --- Activity Logs --- */
-        .log-terminal {
-            background: #060a12;
-            border: 1px solid #1e293b;
+        .asset-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .tag-channel { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+        .tag-group { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .tag-user { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+
+        /* --- Terminal Logs --- */
+        .terminal-logs {
+            background: #040812;
+            border: 1px solid #132238;
             border-radius: 10px;
             padding: 10px;
             font-size: 12px;
             max-height: 140px;
             overflow-y: auto;
             display: none;
-            margin-top: 14px;
+            margin-top: 12px;
             line-height: 1.6;
         }
-
         .log-success { color: #34d399; }
         .log-fail { color: #f87171; }
         .log-info { color: #38bdf8; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-wrapper">
     <!-- Header -->
-    <div class="header">
-        <h1>⚡ Bot Hub & Broadcaster</h1>
-        <div class="security-badge">
-            🔒 End-to-End Client Sandbox: Zero-Knowledge Privacy
-        </div>
+    <div class="top-bar">
+        <h1>⚡ Bot Control Center</h1>
+        <p style="font-size: 11px; color: #34d399; margin-top: 4px;">🔒 Direct Telegram API Sandbox</p>
     </div>
 
-    <!-- Active Bot Card -->
-    <div class="card">
-        <div class="section-title">
-            <span>Manage Connected Bots (Max 15)</span>
-            <span id="botCountLabel" style="color: #38bdf8;">0/15</span>
-        </div>
-
-        <div class="bot-select-row">
-            <select id="botSelector" class="custom-select" onchange="onSelectBot()">
-                <option value="" disabled selected>No Bot Configured</option>
-            </select>
-            <button class="btn-3d btn-green" style="width: auto;" onclick="openAddModal()">+ Add</button>
-            <button class="btn-3d btn-red" id="btnDeleteCurrent" style="width: auto; display: none;" onclick="deleteActiveBot()">🗑️</button>
-        </div>
-
-        <!-- Bot Live Info Display -->
-        <div class="bot-stats-card" id="botDetailsCard" style="display: none;">
-            <div class="bot-meta">
-                <h4 id="activeBotName">🤖 Bot</h4>
-                <span id="activeBotUsername">@username</span>
-            </div>
-            <div class="audience-badge">
-                <div class="num" id="activeAudienceCount">0</div>
-                <div class="lbl">Users Found</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Message & Dispatch Card -->
-    <div class="card">
-        <div class="section-title">
-            <span>Compose Direct Broadcast</span>
-            <button class="btn-3d btn-green" style="width: auto; padding: 4px 8px; font-size: 11px;" onclick="syncBotAudience(true)">🔄 Sync Audience</button>
-        </div>
-
-        <div class="form-group">
-            <label class="field-lbl">Message Body</label>
-            <textarea id="broadcastMsg" class="custom-textarea" rows="4" placeholder="Type your broadcast message here..."></textarea>
-        </div>
-
-        <!-- Typography & Options -->
-        <div class="controls-grid">
-            <label class="control-item">
-                <input type="checkbox" id="checkBold"> <b>Bold</b>
-            </label>
-            <label class="control-item">
-                <input type="checkbox" id="checkItalic"> <i>Italic</i>
-            </label>
-            <label class="control-item">
-                <input type="checkbox" id="checkPin"> 📌 Pin
-            </label>
-        </div>
-
-        <!-- Button Attacher -->
-        <label class="control-item" style="margin-bottom: 10px;">
-            <input type="checkbox" id="toggleButton" onchange="toggleButtonEditor()"> Attach Inline Button
-        </label>
-
-        <div class="btn-builder-box" id="buttonEditor">
-            <input type="text" id="inlineBtnText" class="custom-input" style="margin-bottom: 8px;" placeholder="Button Title (e.g. Join Channel)">
-            <input type="url" id="inlineBtnUrl" class="custom-input" style="margin-bottom: 8px;" placeholder="Target URL (https://t.me/...)">
-            
-            <div class="field-lbl" style="margin-top: 4px;">Button Color:</div>
-            <div class="color-picker-row">
-                <label><input type="radio" name="btnTheme" value="" checked> Default</label>
-                <label style="color: #38bdf8;"><input type="radio" name="btnTheme" value="primary"> 🔵 Blue</label>
-                <label style="color: #34d399;"><input type="radio" name="btnTheme" value="success"> 🟢 Green</label>
-                <label style="color: #f87171;"><input type="radio" name="btnTheme" value="danger"> 🔴 Red</label>
-            </div>
-        </div>
-
-        <!-- Launch Button -->
-        <button class="btn-3d btn-blue" id="btnLaunchBroadcast" onclick="dispatchBroadcast()">
-            🚀 Broadcast to All Audience
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="btnTabPost" onclick="switchTab('post')">
+            🚀 Dispatch & Post
         </button>
-
-        <!-- Live Terminal Logs -->
-        <div class="log-terminal" id="terminalLogs"></div>
+        <button class="tab-btn" id="btnTabSettings" onclick="switchTab('settings')">
+            ⚙️ Vault & Assets
+        </button>
     </div>
-</div>
 
-<!-- Modal: Add New Bot Token -->
-<div class="modal-overlay" id="addBotModal">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3>Add New Bot Token</h3>
-            <button class="modal-close" onclick="closeAddModal()">&times;</button>
+    <!-- ================= TAB 1: DISPATCH / POST ================= -->
+    <div id="viewPost">
+        <!-- Active Bot & Destination Card -->
+        <div class="card">
+            <div class="section-header">
+                <span>1. Select Origin Bot</span>
+                <span id="activeAudienceBadge" style="color: #38bdf8; font-size: 11px;">0 Users Cached</span>
+            </div>
+
+            <div class="form-row">
+                <select id="botSelector" class="c-select" onchange="onActiveBotChanged()">
+                    <option value="" disabled selected>No Bot Configured (Go to Settings)</option>
+                </select>
+            </div>
+
+            <div class="section-header" style="margin-top: 14px;">
+                <span>2. Select Destination Target</span>
+                <button class="btn-3d btn-green" style="padding: 3px 8px; font-size: 10px;" onclick="syncAudience(true)">🔄 Sync Users</button>
+            </div>
+
+            <div class="form-row">
+                <select id="targetSelector" class="c-select">
+                    <option value="AUDIENCE_ALL">👥 All Bot Audience (Auto-Discovered Users)</option>
+                    <option value="CHANNELS_ALL">📢 All Saved Channels</option>
+                    <option value="GROUPS_ALL">👥 All Saved Groups</option>
+                    <!-- Dynamically populated targets -->
+                </select>
+            </div>
         </div>
-        <div class="form-group">
-            <label class="field-lbl">BotFather Token</label>
-            <input type="text" id="newTokenInput" class="custom-input" placeholder="123456789:AAFDZwQ5q_...">
+
+        <!-- Compose Message & Attach Media Card -->
+        <div class="card">
+            <div class="section-header">
+                <span>3. Message & Media Attachment</span>
+            </div>
+
+            <!-- Media File Attachment Button -->
+            <div class="media-strip">
+                <label class="file-upload-btn">
+                    📷 Attach File / Photo
+                    <input type="file" id="mediaFileInput" style="display: none;" onchange="onMediaSelected(this)">
+                </label>
+                <span class="selected-file-label" id="fileSelectedDisplay">No file chosen (Text Only)</span>
+                <button id="btnClearFile" class="btn-3d btn-red hidden" style="padding: 3px 6px;" onclick="clearMediaFile()">✕</button>
+            </div>
+
+            <!-- Message Text / Caption Input -->
+            <div class="form-row">
+                <label class="field-lbl">Message Body / Caption</label>
+                <textarea id="postContent" class="c-textarea" rows="4" placeholder="Write text or photo caption here..."></textarea>
+            </div>
+
+            <!-- Typography & Formatting -->
+            <div class="controls-grid">
+                <label class="control-item"><input type="checkbox" id="checkBold"> <b>Bold</b></label>
+                <label class="control-item"><input type="checkbox" id="checkItalic"> <i>Italic</i></label>
+                <label class="control-item"><input type="checkbox" id="checkPin"> 📌 Pin</label>
+            </div>
+
+            <!-- Button Builder Toggle -->
+            <label class="control-item" style="margin-bottom: 10px;">
+                <input type="checkbox" id="toggleInlineBtn" onchange="toggleBtnEditor()"> Attach Inline Keyboard Button
+            </label>
+
+            <!-- Inline Button Customizer Box -->
+            <div class="btn-builder-box" id="btnEditorBox">
+                <input type="text" id="btnTitleInput" class="c-input" style="margin-bottom: 8px;" placeholder="Button Title (e.g. Visit Channel)">
+                <input type="url" id="btnUrlInput" class="c-input" style="margin-bottom: 8px;" placeholder="Target URL (https://t.me/...)">
+                
+                <span class="field-lbl">Button Color Palette:</span>
+                <div class="color-selector">
+                    <label><input type="radio" name="btnPalette" value="" checked> Default</label>
+                    <label style="color: #38bdf8;"><input type="radio" name="btnPalette" value="primary"> 🔵 Blue</label>
+                    <label style="color: #34d399;"><input type="radio" name="btnPalette" value="success"> 🟢 Green</label>
+                    <label style="color: #f87171;"><input type="radio" name="btnPalette" value="danger"> 🔴 Red</label>
+                </div>
+            </div>
+
+            <!-- 3D Glossy Dispatch Action Button -->
+            <button class="btn-3d btn-blue" id="btnDispatchAction" onclick="executeDispatch()">
+                🚀 Dispatch Broadcast / Post Now
+            </button>
+
+            <!-- Realtime Terminal Logs -->
+            <div class="terminal-logs" id="terminalLogBox"></div>
         </div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
-            Tokens are strictly stored in your Telegram User ID's local cache. No developer or admin can ever access your credentials.
-        </p>
-        <button class="btn-3d btn-green" id="btnConfirmAdd" onclick="addNewBotToken()">Verify & Store Token</button>
+    </div>
+
+    <!-- ================= TAB 2: SETTINGS & VAULT ================= -->
+    <div id="viewSettings" class="hidden">
+        <!-- Bot Token Vault Card -->
+        <div class="card">
+            <div class="section-header">
+                <span>Manage Bot Tokens (Max 15)</span>
+                <span id="tokenCountBadge" style="color: #38bdf8;">0/15</span>
+            </div>
+
+            <div class="form-row" style="display: flex; gap: 8px;">
+                <input type="text" id="inputNewToken" class="c-input" placeholder="Paste BotFather Token...">
+                <button class="btn-3d btn-green" style="width: auto;" onclick="registerNewToken()">+ Add</button>
+            </div>
+
+            <div class="asset-list" id="botTokenListContainer">
+                <!-- Dynamically populated bots -->
+            </div>
+        </div>
+
+        <!-- Channel / Group / User Target Vault Card -->
+        <div class="card">
+            <div class="section-header">
+                <span>Save Channel / Group / User Targets</span>
+            </div>
+
+            <div class="form-row">
+                <label class="field-lbl">Target Type</label>
+                <select id="inputTargetType" class="c-select">
+                    <option value="channel">📢 Channel</option>
+                    <option value="group">👥 Group</option>
+                    <option value="user">👤 User (Private DM)</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label class="field-lbl">Label / Display Name</label>
+                <input type="text" id="inputTargetLabel" class="c-input" placeholder="e.g. VIP Channel or Customer Alex">
+            </div>
+
+            <div class="form-row">
+                <label class="field-lbl">Chat ID or Public @Username</label>
+                <input type="text" id="inputTargetIdentifier" class="c-input" placeholder="@mychannel or -100123456789 or User ID">
+            </div>
+
+            <button class="btn-3d btn-purple" style="width: 100%;" onclick="saveTargetAsset()">
+                💾 Save Target Destination
+            </button>
+
+            <div class="section-header" style="margin-top: 16px;">
+                <span>Saved Assets Directory</span>
+            </div>
+            <div class="asset-list" id="targetAssetsListContainer">
+                <!-- Dynamically populated targets -->
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    // --- 1. Telegram User ID Sandbox Isolation ---
-    let telegramUserId = "anonymous_local_user";
-    let storageKey = "tg_vault_bots_" + telegramUserId;
+    // --- 1. User Sandbox & Storage Architecture ---
+    let telegramUserId = "device_sandbox_user";
+    let storageKey = "tg_full_vault_" + telegramUserId;
 
-    // Detect Telegram Mini App Context
     if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
         if (tgUser && tgUser.id) {
             telegramUserId = String(tgUser.id);
-            storageKey = "tg_vault_user_" + telegramUserId + "_bots";
+            storageKey = "tg_full_vault_user_" + telegramUserId;
         }
     }
 
-    // Maximum tokens allowed per user
-    const MAX_BOTS = 15;
-    let botVault = [];
-    let currentBotIndex = -1;
+    // Vault Data Structure
+    let vault = {
+        bots: [],
+        targets: []
+    };
+    let activeBotIndex = 0;
+    let selectedMediaFile = null;
 
-    // --- 2. Initial Setup & Persistence ---
+    // --- 2. Lifecycle & Storage Loading ---
     window.addEventListener("DOMContentLoaded", () => {
-        loadVault();
+        loadVaultFromStorage();
     });
 
-    function loadVault() {
+    function loadVaultFromStorage() {
         const raw = localStorage.getItem(storageKey);
-        botVault = raw ? JSON.parse(raw) : [];
-        updateBotSelectorUI();
+        if (raw) {
+            try { vault = JSON.parse(raw); } catch (e) { vault = { bots: [], targets: [] }; }
+        }
+        if (!vault.bots) vault.bots = [];
+        if (!vault.targets) vault.targets = [];
+
+        refreshUI();
     }
 
-    function saveVault() {
-        localStorage.setItem(storageKey, JSON.stringify(botVault));
-        updateBotSelectorUI();
+    function saveVaultToStorage() {
+        localStorage.setItem(storageKey, JSON.stringify(vault));
+        refreshUI();
     }
 
-    function updateBotSelectorUI() {
+    function refreshUI() {
+        updateBotDropdown();
+        updateTargetDropdown();
+        renderSettingsBotList();
+        renderSettingsTargetList();
+    }
+
+    // --- 3. Tab Switching ---
+    function switchTab(tab) {
+        const viewPost = document.getElementById("viewPost");
+        const viewSettings = document.getElementById("viewSettings");
+        const btnTabPost = document.getElementById("btnTabPost");
+        const btnTabSettings = document.getElementById("btnTabSettings");
+
+        if (tab === "post") {
+            viewPost.classList.remove("hidden");
+            viewSettings.classList.add("hidden");
+            btnTabPost.classList.add("active");
+            btnTabSettings.classList.remove("active");
+        } else {
+            viewPost.classList.add("hidden");
+            viewSettings.classList.remove("hidden");
+            btnTabPost.classList.remove("active");
+            btnTabSettings.classList.add("active");
+        }
+    }
+
+    // --- 4. Dropdowns & UI Rendering ---
+    function updateBotDropdown() {
         const selector = document.getElementById("botSelector");
-        const countLabel = document.getElementById("botCountLabel");
-        const detailsCard = document.getElementById("botDetailsCard");
-        const deleteBtn = document.getElementById("btnDeleteCurrent");
-
+        const badge = document.getElementById("activeAudienceBadge");
         selector.innerHTML = "";
-        countLabel.innerText = `${botVault.length}/${MAX_BOTS}`;
 
-        if (botVault.length === 0) {
-            selector.innerHTML = '<option value="" disabled selected>No Bot Configured</option>';
-            detailsCard.style.display = "none";
-            deleteBtn.style.display = "none";
-            currentBotIndex = -1;
+        if (vault.bots.length === 0) {
+            selector.innerHTML = '<option value="" disabled selected>No Bot Added (Go to Settings)</option>';
+            badge.innerText = "0 Users Cached";
             return;
         }
 
-        botVault.forEach((bot, index) => {
+        vault.bots.forEach((b, idx) => {
             const opt = document.createElement("option");
-            opt.value = index;
-            opt.innerText = `${bot.name} (@${bot.username})`;
+            opt.value = idx;
+            opt.innerText = `${b.name} (@${b.username})`;
             selector.appendChild(opt);
         });
 
-        if (currentBotIndex < 0 || currentBotIndex >= botVault.length) {
-            currentBotIndex = 0;
-        }
+        if (activeBotIndex >= vault.bots.length) activeBotIndex = 0;
+        selector.value = activeBotIndex;
 
-        selector.value = currentBotIndex;
-        detailsCard.style.display = "flex";
-        deleteBtn.style.display = "inline-flex";
-
-        renderActiveBotInfo();
+        const currentBot = vault.bots[activeBotIndex];
+        badge.innerText = `${(currentBot.audience || []).length} Users Cached`;
     }
 
-    function onSelectBot() {
+    function onActiveBotChanged() {
         const selector = document.getElementById("botSelector");
-        currentBotIndex = parseInt(selector.value);
-        renderActiveBotInfo();
-        syncBotAudience(false);
+        activeBotIndex = parseInt(selector.value) || 0;
+        const badge = document.getElementById("activeAudienceBadge");
+        const currentBot = vault.bots[activeBotIndex];
+        if (currentBot) {
+            badge.innerText = `${(currentBot.audience || []).length} Users Cached`;
+        }
     }
 
-    function renderActiveBotInfo() {
-        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
-        const bot = botVault[currentBotIndex];
-        document.getElementById("activeBotName").innerText = "🤖 " + bot.name;
-        document.getElementById("activeBotUsername").innerText = "@" + bot.username;
-        document.getElementById("activeAudienceCount").innerText = (bot.audience || []).length;
+    function updateTargetDropdown() {
+        const selector = document.getElementById("targetSelector");
+        // Keep default broad options
+        selector.innerHTML = `
+            <option value="AUDIENCE_ALL">👥 All Bot Audience (Auto-Discovered Users)</option>
+            <option value="CHANNELS_ALL">📢 All Saved Channels</option>
+            <option value="GROUPS_ALL">👥 All Saved Groups</option>
+        `;
+
+        // Populate individual saved targets
+        vault.targets.forEach((t, idx) => {
+            const opt = document.createElement("option");
+            opt.value = "TARGET_" + idx;
+            let icon = t.type === "channel" ? "📢" : t.type === "group" ? "👥" : "👤";
+            opt.innerText = `${icon} ${t.label} (${t.identifier})`;
+            selector.appendChild(opt);
+        });
     }
 
-    // --- 3. Modal Controls & Token Add/Delete ---
-    function openAddModal() {
-        if (botVault.length >= MAX_BOTS) {
-            alert(`You have reached the limit of ${MAX_BOTS} bots.`);
+    function renderSettingsBotList() {
+        const container = document.getElementById("botTokenListContainer");
+        const countBadge = document.getElementById("tokenCountBadge");
+        countBadge.innerText = `${vault.bots.length}/15`;
+        container.innerHTML = "";
+
+        if (vault.bots.length === 0) {
+            container.innerHTML = '<span style="font-size:12px; color:var(--text-muted); text-align:center;">No bots registered yet.</span>';
             return;
         }
-        document.getElementById("newTokenInput").value = "";
-        document.getElementById("addBotModal").style.display = "flex";
+
+        vault.bots.forEach((b, idx) => {
+            const card = document.createElement("div");
+            card.className = "asset-card";
+            card.innerHTML = `
+                <div class="asset-info">
+                    <strong>🤖 ${escapeHtml(b.name)}</strong>
+                    <span>@${b.username} • ${(b.audience || []).length} users</span>
+                </div>
+                <button class="btn-3d btn-red" onclick="removeBot(${idx})">🗑️</button>
+            `;
+            container.appendChild(card);
+        });
     }
 
-    function closeAddModal() {
-        document.getElementById("addBotModal").style.display = "none";
-    }
+    function renderSettingsTargetList() {
+        const container = document.getElementById("targetAssetsListContainer");
+        container.innerHTML = "";
 
-    async function addNewBotToken() {
-        const tokenInput = document.getElementById("newTokenInput");
-        const token = tokenInput.value.trim();
-        const addBtn = document.getElementById("btnConfirmAdd");
-
-        if (!token) return alert("Please enter a valid Bot Token!");
-
-        // Duplicate Check
-        if (botVault.some(b => b.token === token)) {
-            return alert("This token has already been added!");
+        if (vault.targets.length === 0) {
+            container.innerHTML = '<span style="font-size:12px; color:var(--text-muted); text-align:center;">No channels, groups or users saved yet.</span>';
+            return;
         }
 
-        addBtn.innerText = "Verifying with Telegram...";
-        addBtn.disabled = true;
+        vault.targets.forEach((t, idx) => {
+            const card = document.createElement("div");
+            card.className = "asset-card";
+            let tagClass = t.type === "channel" ? "tag-channel" : t.type === "group" ? "tag-group" : "tag-user";
+            card.innerHTML = `
+                <div class="asset-info">
+                    <strong>${escapeHtml(t.label)} <span class="asset-tag ${tagClass}">${t.type}</span></strong>
+                    <span>${escapeHtml(t.identifier)}</span>
+                </div>
+                <button class="btn-3d btn-red" onclick="removeTarget(${idx})">🗑️</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // --- 5. Bot & Target Management (Settings) ---
+    async function registerNewToken() {
+        const input = document.getElementById("inputNewToken");
+        const token = input.value.trim();
+
+        if (!token) return alert("Please enter BotFather Token!");
+        if (vault.bots.length >= 15) return alert("Limit of 15 bots reached!");
+        if (vault.bots.some(b => b.token === token)) return alert("This bot is already added!");
 
         try {
             const res = await fetch(`https://api.telegram.org/bot${token}/getMe`);
             const data = await res.json();
+            if (!data.ok) return alert(`Telegram Error: ${data.description}`);
 
-            if (!data.ok) {
-                alert(`Invalid Token: ${data.description}`);
-                addBtn.innerText = "Verify & Store Token";
-                addBtn.disabled = false;
-                return;
-            }
-
-            const newBot = {
+            vault.bots.push({
                 id: data.result.id,
                 name: data.result.first_name,
                 username: data.result.username,
                 token: token,
                 audience: []
-            };
+            });
 
-            botVault.push(newBot);
-            currentBotIndex = botVault.length - 1;
-            saveVault();
-            closeAddModal();
-            syncBotAudience(true);
+            input.value = "";
+            saveVaultToStorage();
+            alert(`Connected: ${data.result.first_name} (@${data.result.username})`);
         } catch (e) {
-            alert("Network connection error. Failed to reach Telegram API.");
-        } finally {
-            addBtn.innerText = "Verify & Store Token";
-            addBtn.disabled = false;
+            alert("Connection error reaching Telegram API!");
         }
     }
 
-    function deleteActiveBot() {
-        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
-        const bot = botVault[currentBotIndex];
-        const confirmDelete = confirm(`Are you sure you want to remove ${bot.name} (@${bot.username}) from your local device?`);
-        
-        if (confirmDelete) {
-            botVault.splice(currentBotIndex, 1);
-            currentBotIndex = botVault.length > 0 ? 0 : -1;
-            saveVault();
+    function removeBot(index) {
+        if (!confirm(`Delete this bot?`)) return;
+        vault.bots.splice(index, 1);
+        saveVaultToStorage();
+    }
+
+    function saveTargetAsset() {
+        const type = document.getElementById("inputTargetType").value;
+        const label = document.getElementById("inputTargetLabel").value.trim();
+        let identifier = document.getElementById("inputTargetIdentifier").value.trim();
+
+        if (!label || !identifier) return alert("Please provide both Label and Identifier!");
+
+        // Normalize links if provided
+        identifier = identifier.replace("https://t.me/", "");
+        if (!identifier.startsWith("@") && isNaN(identifier)) {
+            identifier = "@" + identifier;
+        }
+
+        vault.targets.push({ type, label, identifier });
+        document.getElementById("inputTargetLabel").value = "";
+        document.getElementById("inputTargetIdentifier").value = "";
+        saveVaultToStorage();
+        alert("Target asset saved successfully!");
+    }
+
+    function removeTarget(index) {
+        if (!confirm("Remove this target?")) return;
+        vault.targets.splice(index, 1);
+        saveVaultToStorage();
+    }
+
+    // --- 6. Media Attachment Handling ---
+    function onMediaSelected(input) {
+        if (input.files && input.files[0]) {
+            selectedMediaFile = input.files[0];
+            document.getElementById("fileSelectedDisplay").innerText = selectedMediaFile.name;
+            document.getElementById("btnClearFile").classList.remove("hidden");
         }
     }
 
-    // --- 4. Auto Audience Sync without typing IDs ---
-    async function syncBotAudience(notifyUser = false) {
-        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
-        const bot = botVault[currentBotIndex];
-        const token = bot.token;
+    function clearMediaFile() {
+        selectedMediaFile = null;
+        document.getElementById("mediaFileInput").value = "";
+        document.getElementById("fileSelectedDisplay").innerText = "No file chosen (Text Only)";
+        document.getElementById("btnClearFile").classList.add("hidden");
+    }
 
-        let userSet = new Set(bot.audience || []);
+    function toggleBtnEditor() {
+        const chk = document.getElementById("toggleInlineBtn").checked;
+        document.getElementById("btnEditorBox").style.display = chk ? "block" : "none";
+    }
+
+    function escapeHtml(text) {
+        return (text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // --- 7. Audience Discovery & Sync ---
+    async function syncAudience(alertUser = false) {
+        if (vault.bots.length === 0) return alert("Add a bot in Settings first!");
+        const currentBot = vault.bots[activeBotIndex];
+        const token = currentBot.token;
+
+        let userSet = new Set(currentBot.audience || []);
 
         try {
-            // Delete webhook to read updates directly
             await fetch(`https://api.telegram.org/bot${token}/deleteWebhook`);
-
             const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100`);
             const data = await res.json();
 
@@ -672,126 +820,160 @@
                 });
             }
 
-            bot.audience = Array.from(userSet);
-            saveVault();
+            currentBot.audience = Array.from(userSet);
+            saveVaultToStorage();
 
-            if (notifyUser) {
-                alert(`Sync Complete! Total active users discovered: ${bot.audience.length}`);
-            }
+            if (alertUser) alert(`Sync Complete! ${currentBot.audience.length} active users discovered.`);
         } catch (e) {
-            console.error("Audience sync error:", e);
+            console.error("Sync error:", e);
         }
     }
 
-    // --- 5. UI Helpers ---
-    function toggleButtonEditor() {
-        const isChecked = document.getElementById("toggleButton").checked;
-        document.getElementById("buttonEditor").style.display = isChecked ? "block" : "none";
-    }
+    // --- 8. Core Dispatch & Broadcast Engine ---
+    async function executeDispatch() {
+        if (vault.bots.length === 0) return alert("Please configure a bot in Settings!");
+        const currentBot = vault.bots[activeBotIndex];
+        const token = currentBot.token;
 
-    function escapeHtml(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
+        const targetOption = document.getElementById("targetSelector").value;
+        const rawContent = document.getElementById("postContent").value.trim();
 
-    // --- 6. Broadcast Dispatcher ---
-    async function dispatchBroadcast() {
-        if (currentBotIndex < 0 || !botVault[currentBotIndex]) {
-            return alert("Please select or add an active bot first!");
+        if (!rawContent && !selectedMediaFile) {
+            return alert("Please enter message text or attach a media file!");
         }
 
-        const bot = botVault[currentBotIndex];
-        const token = bot.token;
-        const rawMsg = document.getElementById("broadcastMsg").value.trim();
+        // Determine destination chat IDs
+        let targetChatIds = [];
 
-        if (!rawMsg) return alert("Please enter message text to broadcast!");
-
-        // Refresh audience before firing
-        await syncBotAudience(false);
-        const audience = bot.audience || [];
-
-        if (audience.length === 0) {
-            return alert("No audience found for this bot yet! Have someone interact or send /start to your bot, then press 'Sync Audience'.");
+        if (targetOption === "AUDIENCE_ALL") {
+            await syncAudience(false);
+            targetChatIds = currentBot.audience || [];
+            if (targetChatIds.length === 0) {
+                return alert("No audience found for this bot! Have someone send /start to your bot, then press Sync.");
+            }
+        } else if (targetOption === "CHANNELS_ALL") {
+            targetChatIds = vault.targets.filter(t => t.type === "channel").map(t => t.identifier);
+            if (targetChatIds.length === 0) return alert("No channels saved in Settings!");
+        } else if (targetOption === "GROUPS_ALL") {
+            targetChatIds = vault.targets.filter(t => t.type === "group").map(t => t.identifier);
+            if (targetChatIds.length === 0) return alert("No groups saved in Settings!");
+        } else if (targetOption.startsWith("TARGET_")) {
+            const idx = parseInt(targetOption.replace("TARGET_", ""));
+            if (vault.targets[idx]) targetChatIds = [vault.targets[idx].identifier];
         }
 
-        // Format Text
+        if (targetChatIds.length === 0) return alert("No valid destinations selected!");
+
+        // Formatting
         const isBold = document.getElementById("checkBold").checked;
         const isItalic = document.getElementById("checkItalic").checked;
         const isPin = document.getElementById("checkPin").checked;
 
-        let formattedText = escapeHtml(rawMsg);
+        let formattedText = escapeHtml(rawContent);
         if (isBold) formattedText = `<b>${formattedText}</b>`;
         if (isItalic) formattedText = `<i>${formattedText}</i>`;
 
-        // Format Optional Button
-        let replyMarkup = undefined;
-        const hasBtn = document.getElementById("toggleButton").checked;
-        const btnText = document.getElementById("inlineBtnText").value.trim();
-        const btnUrl = document.getElementById("inlineBtnUrl").value.trim();
-        const btnTheme = document.querySelector('input[name="btnTheme"]:checked').value;
+        // Inline Button Setup
+        let replyMarkupObj = undefined;
+        const hasBtn = document.getElementById("toggleInlineBtn").checked;
+        const btnText = document.getElementById("btnTitleInput").value.trim();
+        const btnUrl = document.getElementById("btnUrlInput").value.trim();
+        const btnPalette = document.querySelector('input[name="btnPalette"]:checked').value;
 
         if (hasBtn && btnText && btnUrl) {
-            const btnObj = { text: btnText, url: btnUrl };
-            if (btnTheme) btnObj.style = btnTheme;
-            replyMarkup = { inline_keyboard: [[btnObj]] };
+            const btnItem = { text: btnText, url: btnUrl };
+            if (btnPalette) btnItem.style = btnPalette;
+            replyMarkupObj = { inline_keyboard: [[btnItem]] };
         }
 
-        const terminal = document.getElementById("terminalLogs");
-        const launchBtn = document.getElementById("btnLaunchBroadcast");
+        const terminal = document.getElementById("terminalLogBox");
+        const actionBtn = document.getElementById("btnDispatchAction");
 
         terminal.style.display = "block";
-        terminal.innerHTML = `<span class="log-info">⚡ Initiating broadcast to ${audience.length} subscribers via @${bot.username}...</span><br>`;
-        launchBtn.disabled = true;
+        terminal.innerHTML = `<span class="log-info">⚡ Initiating dispatch to ${targetChatIds.length} target(s) via @${currentBot.username}...</span><br>`;
+        actionBtn.disabled = true;
 
-        let successCount = 0;
-        let failCount = 0;
+        let sentSuccess = 0;
+        let sentFail = 0;
 
-        for (let i = 0; i < audience.length; i++) {
-            const chatId = audience[i];
-            const payload = {
-                chat_id: chatId,
-                text: formattedText,
-                parse_mode: "HTML"
-            };
-            if (replyMarkup) payload.reply_markup = replyMarkup;
+        for (let i = 0; i < targetChatIds.length; i++) {
+            const destination = targetChatIds[i];
 
             try {
-                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
+                let resData;
 
-                if (data.ok) {
-                    successCount++;
-                    terminal.innerHTML += `<span class="log-success">✔ Delivered to ID: ${chatId}</span><br>`;
+                if (selectedMediaFile) {
+                    // Send Media (Photo / Video / Document) via FormData
+                    const formData = new FormData();
+                    formData.append("chat_id", destination);
+                    if (formattedText) {
+                        formData.append("caption", formattedText);
+                        formData.append("parse_mode", "HTML");
+                    }
+                    if (replyMarkupObj) {
+                        formData.append("reply_markup", JSON.stringify(replyMarkupObj));
+                    }
 
-                    if (isPin && data.result?.message_id) {
+                    let endpoint = "sendDocument";
+                    if (selectedMediaFile.type.startsWith("image/")) {
+                        endpoint = "sendPhoto";
+                        formData.append("photo", selectedMediaFile);
+                    } else if (selectedMediaFile.type.startsWith("video/")) {
+                        endpoint = "sendVideo";
+                        formData.append("video", selectedMediaFile);
+                    } else {
+                        formData.append("document", selectedMediaFile);
+                    }
+
+                    const response = await fetch(`https://api.telegram.org/bot${token}/${endpoint}`, {
+                        method: "POST",
+                        body: formData
+                    });
+                    resData = await response.json();
+                } else {
+                    // Send Text Message
+                    const payload = {
+                        chat_id: destination,
+                        text: formattedText,
+                        parse_mode: "HTML"
+                    };
+                    if (replyMarkupObj) payload.reply_markup = replyMarkupObj;
+
+                    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    resData = await response.json();
+                }
+
+                if (resData.ok) {
+                    sentSuccess++;
+                    terminal.innerHTML += `<span class="log-success">✔ Delivered to: ${destination}</span><br>`;
+
+                    // Optional Pin
+                    if (isPin && resData.result?.message_id) {
                         await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ chat_id: chatId, message_id: data.result.message_id })
+                            body: JSON.stringify({ chat_id: destination, message_id: resData.result.message_id })
                         });
                     }
                 } else {
-                    failCount++;
-                    terminal.innerHTML += `<span class="log-fail">✖ Target ${chatId}: ${data.description}</span><br>`;
+                    sentFail++;
+                    terminal.innerHTML += `<span class="log-fail">✖ ${destination}: ${resData.description}</span><br>`;
                 }
             } catch (err) {
-                failCount++;
-                terminal.innerHTML += `<span class="log-fail">✖ Network dropped on ID: ${chatId}</span><br>`;
+                sentFail++;
+                terminal.innerHTML += `<span class="log-fail">✖ Connection dropped for ${destination}</span><br>`;
             }
 
-            // Anti-flood throttle delay
             await new Promise(r => setTimeout(r, 65));
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        terminal.innerHTML += `<br><span class="log-info"><b>🏁 Finished: ${successCount} Succeeded, ${failCount} Failed.</b></span>`;
-        launchBtn.disabled = false;
+        terminal.innerHTML += `<br><span class="log-info"><b>🏁 Completed: ${sentSuccess} Succeeded, ${sentFail} Failed.</b></span>`;
+        actionBtn.disabled = false;
     }
 </script>
 
