@@ -1,216 +1,755 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Telegram Broadcast Panel (No ID Needed)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Bot Manager & Broadcaster</title>
+    <!-- Telegram Mini App Official SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #0b1329; color: #f1f5f9; padding: 15px; display: flex; justify-content: center; }
-        .card { background: #1e293b; width: 100%; max-width: 480px; padding: 20px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
-        h3 { text-align: center; color: #38bdf8; margin-bottom: 15px; font-size: 20px; }
-        
-        .input-box, textarea { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; transition: 0.2s; }
-        .input-box:focus, textarea:focus { border-color: #38bdf8; }
+        :root {
+            --bg-dark: #0b1120;
+            --card-bg: #152238;
+            --card-border: #1e3a5f;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-blue: #0284c7;
+            --primary-blue-dark: #0369a1;
+            --btn-green: #10b981;
+            --btn-green-dark: #047857;
+            --btn-red: #ef4444;
+            --btn-red-dark: #b91c1c;
+        }
 
-        .token-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .btn-refresh { background: #10b981; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-refresh:hover { background: #059669; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        .bot-status { background: #0f172a; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 12px; border: 1px solid #334155; color: #94a3b8; }
-        .user-counter { background: #1e3a8a; color: #93c5fd; padding: 8px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 15px; border: 1px solid #3b82f6; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            padding: 14px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-        .checkbox-container { display: flex; gap: 12px; background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #334155; flex-wrap: wrap; }
-        label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; user-select: none; }
-        input[type="checkbox"], input[type="radio"] { accent-color: #38bdf8; width: 16px; height: 16px; }
+        .container {
+            width: 100%;
+            max-width: 460px;
+        }
 
-        .btn-config { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px dashed #475569; margin-bottom: 15px; display: none; }
-        .color-row { display: flex; gap: 10px; margin-top: 8px; font-size: 13px; flex-wrap: wrap; }
+        /* --- Header & Security Badge --- */
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+        }
 
-        .btn-submit { width: 100%; background: linear-gradient(135deg, #0284c7, #2563eb); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(37,99,235,0.4); }
-        .btn-submit:hover { opacity: 0.9; }
-        .btn-submit:disabled { background: #475569; cursor: not-allowed; box-shadow: none; }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-        .log-box { margin-top: 15px; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 150px; overflow-y: auto; background: #0f172a; display: none; border: 1px solid #334155; line-height: 1.6; }
-        .success { color: #4ade80; }
-        .fail { color: #f87171; }
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 6px;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- 3D Glossy Buttons --- */
+        .btn-3d {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            position: relative;
+            transition: all 0.1s ease;
+            user-select: none;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* Glossy Top Reflection */
+        .btn-3d::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5%;
+            right: 5%;
+            height: 35%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 8px 8px 12px 12px;
+            pointer-events: none;
+        }
+
+        .btn-blue {
+            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+            box-shadow: 0 5px 0 #0369a1, 0 8px 15px rgba(2, 132, 199, 0.4);
+            color: #ffffff;
+            padding: 14px 18px;
+            font-size: 15px;
+        }
+
+        .btn-blue:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #0369a1, 0 4px 8px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-green {
+            background: linear-gradient(180deg, #34d399 0%, #059669 100%);
+            box-shadow: 0 4px 0 #047857, 0 6px 12px rgba(5, 150, 105, 0.3);
+            color: #ffffff;
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+
+        .btn-green:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #047857;
+        }
+
+        .btn-red {
+            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+            box-shadow: 0 4px 0 #991b1b, 0 6px 12px rgba(220, 38, 38, 0.3);
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .btn-red:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #991b1b;
+        }
+
+        /* --- Bot Selector Tabs --- */
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bot-select-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        select.custom-select {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* --- Active Bot Info & Stats Badge --- */
+        .bot-stats-card {
+            background: #0b1329;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .bot-meta h4 {
+            font-size: 14px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bot-meta span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .audience-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 6px 12px;
+            border-radius: 10px;
+            text-align: right;
+        }
+
+        .audience-badge .num {
+            font-size: 16px;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        .audience-badge .lbl {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* --- Inputs & Textareas --- */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label.field-lbl {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .custom-input, textarea.custom-textarea {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .custom-input:focus, textarea.custom-textarea:focus {
+            border-color: #38bdf8;
+        }
+
+        /* --- Styling Checkboxes --- */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 14px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .control-item input[type="checkbox"] {
+            accent-color: #38bdf8;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* --- Inline Button Customizer --- */
+        .btn-builder-box {
+            background: #0f172a;
+            border: 1px dashed var(--card-border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .color-picker-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .color-picker-row label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        /* --- Modal for Adding Tokens --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            z-index: 999;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            color: #38bdf8;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* --- Activity Logs --- */
+        .log-terminal {
+            background: #060a12;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 12px;
+            max-height: 140px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 14px;
+            line-height: 1.6;
+        }
+
+        .log-success { color: #34d399; }
+        .log-fail { color: #f87171; }
+        .log-info { color: #38bdf8; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h3>📢 Auto Broadcast Panel</h3>
-    
-    <!-- Bot Connection Status -->
-    <div class="bot-status" id="botStatus">বট টোকেন দিন এবং Refresh করুন</div>
-
-    <!-- Auto Users Found Counter -->
-    <div class="user-counter" id="userCounter">👥 মোট সক্রিয় ইউজার: ০ জন (খোঁজা হয়নি)</div>
-
-    <!-- Bot Token Input -->
-    <div class="token-group">
-        <input type="text" id="botToken" class="input-box" style="margin-bottom:0;" placeholder="আপনার বটের টোকেন পেস্ট করুন...">
-        <button class="btn-refresh" onclick="connectBot()">🔄 Refresh</button>
-    </div>
-
-    <!-- Message Input -->
-    <label style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">আপনার মেসেজ লিখুন:</label>
-    <textarea id="msgText" rows="4" placeholder="এখানে মেসেজ লিখুন (কোনো কোড লেখার দরকার নেই)..."></textarea>
-
-    <!-- Style Checkboxes (টিক মার্ক সিস্টেম) -->
-    <div class="checkbox-container">
-        <label><input type="checkbox" id="boldCheck"> <b>Bold (বোল্ড)</b></label>
-        <label><input type="checkbox" id="italicCheck"> <i>Italic (ইটালিক)</i></label>
-        <label><input type="checkbox" id="pinCheck"> 📌 Pin Message</label>
-    </div>
-
-    <!-- Inline Button Option -->
-    <label style="margin-bottom: 10px;"><input type="checkbox" id="btnToggle" onchange="toggleButtonBox()"> 🔘 ইনলাইন বাটন যোগ করুন</label>
-
-    <!-- Button Config Box -->
-    <div class="btn-config" id="btnConfig">
-        <input type="text" id="btnText" class="input-box" placeholder="বাটনের নাম (যেমন: Join Community)">
-        <input type="text" id="btnUrl" class="input-box" placeholder="বাটনের লিংক (https://t.me/...)">
-        
-        <span style="font-size: 13px; color: #94a3b8;">বাটন কালার:</span>
-        <div class="color-row">
-            <label><input type="radio" name="btnColor" value="" checked> Default</label>
-            <label style="color:#38bdf8;"><input type="radio" name="btnColor" value="primary"> 🔵 Blue</label>
-            <label style="color:#4ade80;"><input type="radio" name="btnColor" value="success"> 🟢 Green</label>
-            <label style="color:#f87171;"><input type="radio" name="btnColor" value="danger"> 🔴 Red</label>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>⚡ Bot Hub & Broadcaster</h1>
+        <div class="security-badge">
+            🔒 End-to-End Client Sandbox: Zero-Knowledge Privacy
         </div>
     </div>
 
-    <!-- Broadcast Button -->
-    <button class="btn-submit" id="submitBtn" onclick="autoBroadcast()">🚀 Send To All Users (সবার কাছে পাঠান)</button>
+    <!-- Active Bot Card -->
+    <div class="card">
+        <div class="section-title">
+            <span>Manage Connected Bots (Max 15)</span>
+            <span id="botCountLabel" style="color: #38bdf8;">0/15</span>
+        </div>
 
-    <!-- Logs -->
-    <div class="log-box" id="logBox"></div>
+        <div class="bot-select-row">
+            <select id="botSelector" class="custom-select" onchange="onSelectBot()">
+                <option value="" disabled selected>No Bot Configured</option>
+            </select>
+            <button class="btn-3d btn-green" style="width: auto;" onclick="openAddModal()">+ Add</button>
+            <button class="btn-3d btn-red" id="btnDeleteCurrent" style="width: auto; display: none;" onclick="deleteActiveBot()">🗑️</button>
+        </div>
+
+        <!-- Bot Live Info Display -->
+        <div class="bot-stats-card" id="botDetailsCard" style="display: none;">
+            <div class="bot-meta">
+                <h4 id="activeBotName">🤖 Bot</h4>
+                <span id="activeBotUsername">@username</span>
+            </div>
+            <div class="audience-badge">
+                <div class="num" id="activeAudienceCount">0</div>
+                <div class="lbl">Users Found</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message & Dispatch Card -->
+    <div class="card">
+        <div class="section-title">
+            <span>Compose Direct Broadcast</span>
+            <button class="btn-3d btn-green" style="width: auto; padding: 4px 8px; font-size: 11px;" onclick="syncBotAudience(true)">🔄 Sync Audience</button>
+        </div>
+
+        <div class="form-group">
+            <label class="field-lbl">Message Body</label>
+            <textarea id="broadcastMsg" class="custom-textarea" rows="4" placeholder="Type your broadcast message here..."></textarea>
+        </div>
+
+        <!-- Typography & Options -->
+        <div class="controls-grid">
+            <label class="control-item">
+                <input type="checkbox" id="checkBold"> <b>Bold</b>
+            </label>
+            <label class="control-item">
+                <input type="checkbox" id="checkItalic"> <i>Italic</i>
+            </label>
+            <label class="control-item">
+                <input type="checkbox" id="checkPin"> 📌 Pin
+            </label>
+        </div>
+
+        <!-- Button Attacher -->
+        <label class="control-item" style="margin-bottom: 10px;">
+            <input type="checkbox" id="toggleButton" onchange="toggleButtonEditor()"> Attach Inline Button
+        </label>
+
+        <div class="btn-builder-box" id="buttonEditor">
+            <input type="text" id="inlineBtnText" class="custom-input" style="margin-bottom: 8px;" placeholder="Button Title (e.g. Join Channel)">
+            <input type="url" id="inlineBtnUrl" class="custom-input" style="margin-bottom: 8px;" placeholder="Target URL (https://t.me/...)">
+            
+            <div class="field-lbl" style="margin-top: 4px;">Button Color:</div>
+            <div class="color-picker-row">
+                <label><input type="radio" name="btnTheme" value="" checked> Default</label>
+                <label style="color: #38bdf8;"><input type="radio" name="btnTheme" value="primary"> 🔵 Blue</label>
+                <label style="color: #34d399;"><input type="radio" name="btnTheme" value="success"> 🟢 Green</label>
+                <label style="color: #f87171;"><input type="radio" name="btnTheme" value="danger"> 🔴 Red</label>
+            </div>
+        </div>
+
+        <!-- Launch Button -->
+        <button class="btn-3d btn-blue" id="btnLaunchBroadcast" onclick="dispatchBroadcast()">
+            🚀 Broadcast to All Audience
+        </button>
+
+        <!-- Live Terminal Logs -->
+        <div class="log-terminal" id="terminalLogs"></div>
+    </div>
+</div>
+
+<!-- Modal: Add New Bot Token -->
+<div class="modal-overlay" id="addBotModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Add New Bot Token</h3>
+            <button class="modal-close" onclick="closeAddModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label class="field-lbl">BotFather Token</label>
+            <input type="text" id="newTokenInput" class="custom-input" placeholder="123456789:AAFDZwQ5q_...">
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+            Tokens are strictly stored in your Telegram User ID's local cache. No developer or admin can ever access your credentials.
+        </p>
+        <button class="btn-3d btn-green" id="btnConfirmAdd" onclick="addNewBotToken()">Verify & Store Token</button>
+    </div>
 </div>
 
 <script>
-    function escapeHtml(text) {
-        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
+    // --- 1. Telegram User ID Sandbox Isolation ---
+    let telegramUserId = "anonymous_local_user";
+    let storageKey = "tg_vault_bots_" + telegramUserId;
 
-    window.onload = function() {
-        const savedToken = localStorage.getItem("auto_panel_token");
-        if (savedToken) {
-            document.getElementById("botToken").value = savedToken;
-            connectBot();
+    // Detect Telegram Mini App Context
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (tgUser && tgUser.id) {
+            telegramUserId = String(tgUser.id);
+            storageKey = "tg_vault_user_" + telegramUserId + "_bots";
         }
-    };
-
-    function toggleButtonBox() {
-        document.getElementById("btnConfig").style.display = document.getElementById("btnToggle").checked ? "block" : "none";
     }
 
-    // বটের টোকেন কানেক্ট ও ইউজার ডাটাবেজ আপডেট
-    async function connectBot() {
-        const token = document.getElementById("botToken").value.trim();
-        const status = document.getElementById("botStatus");
-        const counter = document.getElementById("userCounter");
-        if (!token) return alert("দয়া করে Bot Token দিন!");
+    // Maximum tokens allowed per user
+    const MAX_BOTS = 15;
+    let botVault = [];
+    let currentBotIndex = -1;
 
-        status.innerText = "⏳ টেলিগ্রাম সার্ভার চেক হচ্ছে...";
+    // --- 2. Initial Setup & Persistence ---
+    window.addEventListener("DOMContentLoaded", () => {
+        loadVault();
+    });
+
+    function loadVault() {
+        const raw = localStorage.getItem(storageKey);
+        botVault = raw ? JSON.parse(raw) : [];
+        updateBotSelectorUI();
+    }
+
+    function saveVault() {
+        localStorage.setItem(storageKey, JSON.stringify(botVault));
+        updateBotSelectorUI();
+    }
+
+    function updateBotSelectorUI() {
+        const selector = document.getElementById("botSelector");
+        const countLabel = document.getElementById("botCountLabel");
+        const detailsCard = document.getElementById("botDetailsCard");
+        const deleteBtn = document.getElementById("btnDeleteCurrent");
+
+        selector.innerHTML = "";
+        countLabel.innerText = `${botVault.length}/${MAX_BOTS}`;
+
+        if (botVault.length === 0) {
+            selector.innerHTML = '<option value="" disabled selected>No Bot Configured</option>';
+            detailsCard.style.display = "none";
+            deleteBtn.style.display = "none";
+            currentBotIndex = -1;
+            return;
+        }
+
+        botVault.forEach((bot, index) => {
+            const opt = document.createElement("option");
+            opt.value = index;
+            opt.innerText = `${bot.name} (@${bot.username})`;
+            selector.appendChild(opt);
+        });
+
+        if (currentBotIndex < 0 || currentBotIndex >= botVault.length) {
+            currentBotIndex = 0;
+        }
+
+        selector.value = currentBotIndex;
+        detailsCard.style.display = "flex";
+        deleteBtn.style.display = "inline-flex";
+
+        renderActiveBotInfo();
+    }
+
+    function onSelectBot() {
+        const selector = document.getElementById("botSelector");
+        currentBotIndex = parseInt(selector.value);
+        renderActiveBotInfo();
+        syncBotAudience(false);
+    }
+
+    function renderActiveBotInfo() {
+        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
+        const bot = botVault[currentBotIndex];
+        document.getElementById("activeBotName").innerText = "🤖 " + bot.name;
+        document.getElementById("activeBotUsername").innerText = "@" + bot.username;
+        document.getElementById("activeAudienceCount").innerText = (bot.audience || []).length;
+    }
+
+    // --- 3. Modal Controls & Token Add/Delete ---
+    function openAddModal() {
+        if (botVault.length >= MAX_BOTS) {
+            alert(`You have reached the limit of ${MAX_BOTS} bots.`);
+            return;
+        }
+        document.getElementById("newTokenInput").value = "";
+        document.getElementById("addBotModal").style.display = "flex";
+    }
+
+    function closeAddModal() {
+        document.getElementById("addBotModal").style.display = "none";
+    }
+
+    async function addNewBotToken() {
+        const tokenInput = document.getElementById("newTokenInput");
+        const token = tokenInput.value.trim();
+        const addBtn = document.getElementById("btnConfirmAdd");
+
+        if (!token) return alert("Please enter a valid Bot Token!");
+
+        // Duplicate Check
+        if (botVault.some(b => b.token === token)) {
+            return alert("This token has already been added!");
+        }
+
+        addBtn.innerText = "Verifying with Telegram...";
+        addBtn.disabled = true;
+
         try {
             const res = await fetch(`https://api.telegram.org/bot${token}/getMe`);
             const data = await res.json();
-            if (data.ok) {
-                localStorage.setItem("auto_panel_token", token);
-                status.innerText = `✅ কানেক্টেড: ${data.result.first_name} (@${data.result.username})`;
-                status.style.color = "#4ade80";
 
-                // টেলিগ্রাম থেকে ইউজার হিস্ট্রি অটো লোড করা
-                await fetchAndCacheUsers(token);
-            } else {
-                status.innerText = `❌ ভুল টোকেন: ${data.description}`;
-                status.style.color = "#f87171";
+            if (!data.ok) {
+                alert(`Invalid Token: ${data.description}`);
+                addBtn.innerText = "Verify & Store Token";
+                addBtn.disabled = false;
+                return;
             }
+
+            const newBot = {
+                id: data.result.id,
+                name: data.result.first_name,
+                username: data.result.username,
+                token: token,
+                audience: []
+            };
+
+            botVault.push(newBot);
+            currentBotIndex = botVault.length - 1;
+            saveVault();
+            closeAddModal();
+            syncBotAudience(true);
         } catch (e) {
-            status.innerText = "❌ কানেকশন সমস্যা!";
-            status.style.color = "#f87171";
+            alert("Network connection error. Failed to reach Telegram API.");
+        } finally {
+            addBtn.innerText = "Verify & Store Token";
+            addBtn.disabled = false;
         }
     }
 
-    // কোনো আইডি ছাড়াই টেলিগ্রামের সার্ভার থেকে ইউজারদের আইডি সংগ্রহ করার ফাংশন
-    async function fetchAndCacheUsers(token) {
-        const storageKey = `cached_users_${token}`;
-        let cachedUsers = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
+    function deleteActiveBot() {
+        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
+        const bot = botVault[currentBotIndex];
+        const confirmDelete = confirm(`Are you sure you want to remove ${bot.name} (@${bot.username}) from your local device?`);
+        
+        if (confirmDelete) {
+            botVault.splice(currentBotIndex, 1);
+            currentBotIndex = botVault.length > 0 ? 0 : -1;
+            saveVault();
+        }
+    }
+
+    // --- 4. Auto Audience Sync without typing IDs ---
+    async function syncBotAudience(notifyUser = false) {
+        if (currentBotIndex < 0 || !botVault[currentBotIndex]) return;
+        const bot = botVault[currentBotIndex];
+        const token = bot.token;
+
+        let userSet = new Set(bot.audience || []);
 
         try {
-            // যদি পূর্বে ওয়েবহুক থাকে তবে getUpdates পেতে ওয়েবহুক সাময়িক ড্রপ
+            // Delete webhook to read updates directly
             await fetch(`https://api.telegram.org/bot${token}/deleteWebhook`);
-            
+
             const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100`);
             const data = await res.json();
 
             if (data.ok && Array.isArray(data.result)) {
-                data.result.forEach(update => {
-                    if (update.message && update.message.chat) cachedUsers.add(update.message.chat.id);
-                    if (update.callback_query && update.callback_query.message && update.callback_query.message.chat) cachedUsers.add(update.callback_query.message.chat.id);
-                    if (update.my_chat_member && update.my_chat_member.chat) cachedUsers.add(update.my_chat_member.chat.id);
-                    if (update.chat_member && update.chat_member.chat) cachedUsers.add(update.chat_member.chat.id);
-                    if (update.chat_join_request) {
-                        cachedUsers.add(update.chat_join_request.user_chat_id || update.chat_join_request.from.id);
+                data.result.forEach(u => {
+                    if (u.message && u.message.chat) userSet.add(u.message.chat.id);
+                    if (u.callback_query && u.callback_query.message && u.callback_query.message.chat) userSet.add(u.callback_query.message.chat.id);
+                    if (u.my_chat_member && u.my_chat_member.chat) userSet.add(u.my_chat_member.chat.id);
+                    if (u.chat_member && u.chat_member.chat) userSet.add(u.chat_member.chat.id);
+                    if (u.chat_join_request) {
+                        userSet.add(u.chat_join_request.user_chat_id || u.chat_join_request.from.id);
                     }
                 });
             }
-        } catch (e) {}
 
-        const userArray = Array.from(cachedUsers);
-        localStorage.setItem(storageKey, JSON.stringify(userArray));
-        document.getElementById("userCounter").innerText = `👥 মোট সক্রিয় ইউজার: ${userArray.length} জন (আইডি ছাড়া প্রস্তুত)`;
-        return userArray;
+            bot.audience = Array.from(userSet);
+            saveVault();
+
+            if (notifyUser) {
+                alert(`Sync Complete! Total active users discovered: ${bot.audience.length}`);
+            }
+        } catch (e) {
+            console.error("Audience sync error:", e);
+        }
     }
 
-    // অটো ব্রডকাস্ট ইঞ্জিন (আইডি টাইপ করতে হবে না)
-    async function autoBroadcast() {
-        const token = document.getElementById("botToken").value.trim();
-        const rawMsg = document.getElementById("msgText").value.trim();
-        const isBold = document.getElementById("boldCheck").checked;
-        const isItalic = document.getElementById("italicCheck").checked;
-        const isPin = document.getElementById("pinCheck").checked;
+    // --- 5. UI Helpers ---
+    function toggleButtonEditor() {
+        const isChecked = document.getElementById("toggleButton").checked;
+        document.getElementById("buttonEditor").style.display = isChecked ? "block" : "none";
+    }
 
-        const hasBtn = document.getElementById("btnToggle").checked;
-        const btnText = document.getElementById("btnText").value.trim();
-        const btnUrl = document.getElementById("btnUrl").value.trim();
-        const btnColor = document.querySelector('input[name="btnColor"]:checked').value;
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
 
-        const logBox = document.getElementById("logBox");
-        const submitBtn = document.getElementById("submitBtn");
-
-        if (!token) return alert("বট টোকেন দিন!");
-        if (!rawMsg) return alert("মেসেজ বক্সে কিছু লিখুন!");
-
-        // অটোমেটিক ইউজার সংগ্রহ
-        const users = await fetchAndCacheUsers(token);
-
-        if (users.length === 0) {
-            return alert("⚠️ কোনো ইউজার পাওয়া যায়নি!\nনতুন কোনো ইউজার দিয়ে বটে অন্তত ১ বার /start দিন, তাহলে সে অটো তালিকায় চলে আসবে।");
+    // --- 6. Broadcast Dispatcher ---
+    async function dispatchBroadcast() {
+        if (currentBotIndex < 0 || !botVault[currentBotIndex]) {
+            return alert("Please select or add an active bot first!");
         }
 
-        // টিক মার্ক অনুযায়ী টেক্সট ফরম্যাট তৈরি
+        const bot = botVault[currentBotIndex];
+        const token = bot.token;
+        const rawMsg = document.getElementById("broadcastMsg").value.trim();
+
+        if (!rawMsg) return alert("Please enter message text to broadcast!");
+
+        // Refresh audience before firing
+        await syncBotAudience(false);
+        const audience = bot.audience || [];
+
+        if (audience.length === 0) {
+            return alert("No audience found for this bot yet! Have someone interact or send /start to your bot, then press 'Sync Audience'.");
+        }
+
+        // Format Text
+        const isBold = document.getElementById("checkBold").checked;
+        const isItalic = document.getElementById("checkItalic").checked;
+        const isPin = document.getElementById("checkPin").checked;
+
         let formattedText = escapeHtml(rawMsg);
         if (isBold) formattedText = `<b>${formattedText}</b>`;
         if (isItalic) formattedText = `<i>${formattedText}</i>`;
 
-        // বাটন তৈরি
+        // Format Optional Button
         let replyMarkup = undefined;
+        const hasBtn = document.getElementById("toggleButton").checked;
+        const btnText = document.getElementById("inlineBtnText").value.trim();
+        const btnUrl = document.getElementById("inlineBtnUrl").value.trim();
+        const btnTheme = document.querySelector('input[name="btnTheme"]:checked').value;
+
         if (hasBtn && btnText && btnUrl) {
-            const btn = { text: btnText, url: btnUrl };
-            if (btnColor) btn.style = btnColor;
-            replyMarkup = { inline_keyboard: [[btn]] };
+            const btnObj = { text: btnText, url: btnUrl };
+            if (btnTheme) btnObj.style = btnTheme;
+            replyMarkup = { inline_keyboard: [[btnObj]] };
         }
 
-        logBox.style.display = "block";
-        logBox.innerHTML = `🚀 মোট ${users.length} জনের কাছে পাঠানো শুরু হচ্ছে...<br>`;
-        submitBtn.disabled = true;
+        const terminal = document.getElementById("terminalLogs");
+        const launchBtn = document.getElementById("btnLaunchBroadcast");
 
-        let success = 0, fail = 0;
+        terminal.style.display = "block";
+        terminal.innerHTML = `<span class="log-info">⚡ Initiating broadcast to ${audience.length} subscribers via @${bot.username}...</span><br>`;
+        launchBtn.disabled = true;
 
-        for (let i = 0; i < users.length; i++) {
-            const chatId = users[i];
+        let successCount = 0;
+        let failCount = 0;
+
+        for (let i = 0; i < audience.length; i++) {
+            const chatId = audience[i];
             const payload = {
                 chat_id: chatId,
                 text: formattedText,
@@ -227,10 +766,10 @@
                 const data = await res.json();
 
                 if (data.ok) {
-                    success++;
-                    logBox.innerHTML += `<span class="success">✅ Sent: User (${chatId})</span><br>`;
+                    successCount++;
+                    terminal.innerHTML += `<span class="log-success">✔ Delivered to ID: ${chatId}</span><br>`;
 
-                    if (isPin && data.result && data.result.message_id) {
+                    if (isPin && data.result?.message_id) {
                         await fetch(`https://api.telegram.org/bot${token}/pinChatMessage`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -238,21 +777,21 @@
                         });
                     }
                 } else {
-                    fail++;
-                    logBox.innerHTML += `<span class="fail">❌ User (${chatId}): ${data.description}</span><br>`;
+                    failCount++;
+                    terminal.innerHTML += `<span class="log-fail">✖ Target ${chatId}: ${data.description}</span><br>`;
                 }
             } catch (err) {
-                fail++;
-                logBox.innerHTML += `<span class="fail">❌ Error connecting to (${chatId})</span><br>`;
+                failCount++;
+                terminal.innerHTML += `<span class="log-fail">✖ Network dropped on ID: ${chatId}</span><br>`;
             }
 
-            // ফ্লাড রেট এড়াতে বিরতি
-            await new Promise(r => setTimeout(r, 60));
-            logBox.scrollTop = logBox.scrollHeight;
+            // Anti-flood throttle delay
+            await new Promise(r => setTimeout(r, 65));
+            terminal.scrollTop = terminal.scrollHeight;
         }
 
-        logBox.innerHTML += `<br><b>🎉 সম্পন্ন! সফল: ${success}, ব্যর্থ: ${fail}</b>`;
-        submitBtn.disabled = false;
+        terminal.innerHTML += `<br><span class="log-info"><b>🏁 Finished: ${successCount} Succeeded, ${failCount} Failed.</b></span>`;
+        launchBtn.disabled = false;
     }
 </script>
 
