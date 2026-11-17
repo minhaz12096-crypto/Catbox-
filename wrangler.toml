@@ -5,4 +5,4 @@ compatibility_date = "2024-01-01"
 # KV ডাটাবেজ কানেকশন
 [[kv_namespaces]]
 binding = "USERS_KV"
-id = "YOUR_KV_NAMESPACE_ID"   # <-- এখানে আপনার Cloudflare KV ID বসাবেন
+id = "7517dbc4b798465b9949ad253425f387"   # <-- এখানে আপনার Cloudflare KV ID বসাবেন
